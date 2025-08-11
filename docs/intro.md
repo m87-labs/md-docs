@@ -1,48 +1,25 @@
 ---
-slug: /
-sidebar_position: 1
+title: "Intro to Moondream"
 ---
 
-# Tutorial Intro
+# Introduction to Moondream
 
-Let's discover **Docusaurus in less than 5 minutes**.
+## Build with Moondream
 
-## Getting Started
+Moondream is a tiny open-source vision AI that brings powerful image understanding to your applications and runs everywhere. Available in two optimized variants—Moondream 2B (3.9GB) for optimal performance and Moondream 0.5B (400MB) for resource-constrained environments—this compact model offers exceptional efficiency with faster inference times and lower computational requirements.
 
-Get started by **creating a new site**.
+Interact with Moondream using simple, intuitive language without specialized machine learning expertise, making advanced vision AI accessible to developers of all backgrounds. As a vertically integrated model company, we deliver consistent visual understanding across our core capabilities while continuously evolving.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+Want to see Moondream in action? Try our [Interactive Playground](/c/playground) to experiment with different capabilities. Need help getting started? Join our [Discord community](https://discord.com/invite/tRUdpjDQfH) for support and discussions.
 
-### What you'll need
+## Core Capabilities
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+## What is Moondream?
 
-## Generate a new site
+Moondream represents a new generation of multimodal AI that seamlessly combines visual perception with language understanding. At its core, Moondream integrates an advanced CLIP-based vision encoder that transforms images into rich feature representations. These visual features are then processed through a specialized projector that converts them into a format the language model can interpret and reason about.
 
-Generate a new Docusaurus site using the **classic template**.
+The language model component has been meticulously optimized for visual understanding, enabling Moondream to perceive images with remarkable clarity and communicate about them using natural language. This architecture allows Moondream to process both text and images as unified inputs, perform sophisticated visual reasoning tasks, and generate detailed textual responses about visual content.
 
-The classic template will automatically be added to your project after you run the command:
+## Solutions
 
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+As a vertically integrated AI company, we regularly roll out new capabilities that extend beyond the core features. Our development roadmap continuously expands what Moondream can do:

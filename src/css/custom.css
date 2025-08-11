@@ -4,35 +4,229 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
+/**
+ * Black and White Docusaurus Theme with Custom Variables
+ * Easy to customize by changing the variables at the top
+ */
+
+/* Custom theme variables - Change these to modify the entire theme */
 :root {
-  --ifm-color-primary: #2e8555;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  /* Theme color palette */
+  --theme-bg-primary: #000000;      /* Main background */
+  --theme-bg-secondary: #111111;    /* Cards, surfaces */
+  --theme-bg-tertiary: #1a1a1a;     /* Code blocks, inputs */
+  --theme-bg-hover: #222222;        /* Hover backgrounds */
+  
+  --theme-text-primary: #cccccc;    /* Main text color */
+  --theme-text-secondary: #999999;  /* Secondary text */
+  --theme-text-inverse: #000000;    /* Text on light backgrounds */
+  
+  --theme-accent-primary: #ffffff;  /* Links, highlights, active items */
+  --theme-accent-secondary: #e6e6e6; /* Hover states */
+  --theme-accent-tertiary: #d9d9d9;  /* Pressed/darker states */
+  
+  --theme-border-color: #333333;    /* Borders, dividers */
+  --theme-border-light: #444444;    /* Lighter borders */
+
+  /* Apply custom variables to Docusaurus CSS variables */
+  
+  /* Primary colors - use accent for highlights/links */
+  --ifm-color-primary: var(--theme-accent-primary);
+  --ifm-color-primary-dark: var(--theme-accent-secondary);
+  --ifm-color-primary-darker: var(--theme-accent-tertiary);
+  --ifm-color-primary-darkest: #b3b3b3;
+  --ifm-color-primary-light: var(--theme-accent-primary);
+  --ifm-color-primary-lighter: var(--theme-accent-primary);
+  --ifm-color-primary-lightest: var(--theme-accent-primary);
+
+  /* Background colors */
+  --ifm-background-color: var(--theme-bg-primary);
+  --ifm-background-surface-color: var(--theme-bg-secondary);
+
+  /* Text colors */
+  --ifm-font-color-base: var(--theme-text-primary);
+  --ifm-font-color-base-inverse: var(--theme-text-inverse);
+  --ifm-font-color-secondary: var(--theme-text-secondary);
+
+  /* Link styling */
+  --ifm-link-color: var(--theme-accent-primary);
+  --ifm-link-hover-color: var(--theme-accent-primary);
+
+  /* Navbar */
+  --ifm-navbar-background-color: var(--theme-bg-primary);
+  --ifm-navbar-link-color: var(--theme-text-primary);
+  --ifm-navbar-link-hover-color: var(--theme-accent-primary);
+
+  /* Sidebar */
+  --ifm-menu-color: var(--theme-text-primary);
+  --ifm-menu-color-background-active: var(--theme-bg-hover);
+  --ifm-menu-color-background-hover: var(--theme-bg-tertiary);
+
+  /* Code blocks */
+  --ifm-code-background: var(--theme-bg-tertiary);
+  --ifm-code-color: var(--theme-text-primary);
+
+  /* Borders */
+  --ifm-color-emphasis-200: var(--theme-border-color);
+  --ifm-color-emphasis-300: var(--theme-border-light);
+  --ifm-hr-background-color: var(--theme-border-color);
+
+  /* Tables */
+  --ifm-table-stripe-background: var(--theme-bg-secondary);
+  --ifm-table-border-color: var(--theme-border-color);
+
+  /* Blockquotes */
+  --ifm-blockquote-background-color: var(--theme-bg-secondary);
+  --ifm-blockquote-border-color: var(--theme-accent-primary);
+
+  /* Alerts/Admonitions */
+  --ifm-color-info: var(--theme-accent-primary);
+  --ifm-color-warning: var(--theme-accent-primary);
+  --ifm-color-danger: var(--theme-accent-primary);
+  --ifm-color-success: var(--theme-accent-primary);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark mode - make it the same as light mode for consistency */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  /* Use same values as light mode */
+  --ifm-color-primary: var(--theme-accent-primary);
+  --ifm-color-primary-dark: var(--theme-accent-secondary);
+  --ifm-color-primary-darker: var(--theme-accent-tertiary);
+  --ifm-color-primary-darkest: #b3b3b3;
+  --ifm-color-primary-light: var(--theme-accent-primary);
+  --ifm-color-primary-lighter: var(--theme-accent-primary);
+  --ifm-color-primary-lightest: var(--theme-accent-primary);
+
+  --ifm-background-color: var(--theme-bg-primary);
+  --ifm-background-surface-color: var(--theme-bg-secondary);
+  --ifm-font-color-base: var(--theme-text-primary);
+  --ifm-link-color: var(--theme-accent-primary);
+  --ifm-link-hover-color: var(--theme-accent-primary);
 }
 
-.menu__caret {
-  transform: scale(0.7);
+/* Component-specific styles using variables */
+
+/* Underline all links in documentation content */
+.theme-doc-markdown a {
+  text-decoration: underline;
 }
 
-.theme-doc-sidebar-menu {
-  font-size: 14px;
+/* Navbar styling */
+.navbar__title {
+  color: var(--theme-accent-primary) !important;
 }
+
+.navbar__item.navbar__link {
+  color: var(--theme-text-primary) !important;
+}
+
+.navbar__item.navbar__link:hover {
+  color: var(--theme-accent-primary) !important;
+}
+
+/* Sidebar menu items */
+.menu__link {
+  color: var(--theme-text-primary) !important;
+  font-size: 13px;
+}
+
+.menu__link:hover,
+.menu__link--active {
+  color: var(--theme-accent-primary) !important;
+  background-color: var(--theme-bg-hover) !important;
+}
+
+/* Search bar styling */
+.navbar__search-input {
+  background-color: var(--theme-bg-hover) !important;
+  border: 1px solid var(--theme-border-light) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.navbar__search-input:focus {
+  border-color: var(--theme-accent-primary) !important;
+}
+
+/* Hero section */
+.hero__title {
+  color: var(--theme-accent-primary) !important;
+}
+
+.hero__subtitle {
+  color: var(--theme-text-primary) !important;
+}
+
+/* Button styling */
+.button {
+  border: 1px solid var(--theme-accent-primary) !important;
+  color: var(--theme-accent-primary) !important;
+  background-color: transparent !important;
+}
+
+.button:hover {
+  background-color: var(--theme-accent-primary) !important;
+  color: var(--theme-text-inverse) !important;
+}
+
+.button--primary {
+  background-color: var(--theme-accent-primary) !important;
+  color: var(--theme-text-inverse) !important;
+}
+
+.button--primary:hover {
+  background-color: var(--theme-accent-secondary) !important;
+}
+
+/* Table of contents */
+.table-of-contents__link {
+  color: var(--theme-text-primary) !important;
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--theme-accent-primary) !important;
+}
+
+/* Pagination */
+.pagination-nav__label {
+  color: var(--theme-text-primary) !important;
+}
+
+.pagination-nav__link:hover .pagination-nav__label {
+  color: var(--theme-accent-primary) !important;
+}
+
+/* Footer styling */
+.footer {
+  background-color: var(--theme-bg-primary) !important;
+  color: var(--theme-text-primary) !important;
+}
+
+.footer__link-item {
+  color: var(--theme-text-primary) !important;
+}
+
+.footer__link-item:hover {
+  color: var(--theme-accent-primary) !important;
+}
+
+/* 
+  CUSTOMIZATION GUIDE:
+  
+  To change the theme colors, modify these variables at the top:
+  
+  For a blue accent theme:
+  --theme-accent-primary: #4A90E2;
+  
+  For a green accent theme:
+  --theme-accent-primary: #7ED321;
+  
+  For lighter backgrounds:
+  --theme-bg-primary: #1a1a1a;
+  --theme-bg-secondary: #2a2a2a;
+  
+  For lighter text:
+  --theme-text-primary: #f0f0f0;
+  
+  Everything else will automatically update!
+*/
