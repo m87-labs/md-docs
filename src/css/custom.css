@@ -28,3 +28,11 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+.menu__caret {
+  transform: scale(0.7);
+}
+
+.theme-doc-sidebar-menu {
+  font-size: 14px;
+}

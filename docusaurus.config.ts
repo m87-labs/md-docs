@@ -5,9 +5,9 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'My Site',
-  tagline: 'Dinosaurs are cool',
-  favicon: 'img/favicon.ico',
+  title: 'Moondream Docs',
+  tagline: 'Documentation for Moondream',
+  favicon: 'img/md_logo.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -15,15 +15,15 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://your-docusaurus-site.example.com',
+  url: 'https://lumal-code.github.io/',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/',
+  baseUrl: '/md-docs/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'facebook', // Usually your GitHub org/user name.
-  projectName: 'docusaurus', // Usually your repo name.
+  organizationName: 'lumal-code', // Usually your GitHub org/user name.
+  projectName: 'md-docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -41,13 +41,15 @@ const config: Config = {
       'classic',
       {
         docs: {
+          routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
             'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
         },
-        blog: {
+        blog: false,
+        /*{
           showReadingTime: true,
           feedOptions: {
             type: ['rss', 'atom'],
@@ -61,7 +63,7 @@ const config: Config = {
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
           onUntruncatedBlogPosts: 'warn',
-        },
+        },*/
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -73,11 +75,14 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'My Site',
+      title: 'Moondream Docs',
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: 'Moondream Logo',
+        src: 'img/md_logo.svg',
+        width: 32,
+        height: 32,
       },
+      /*
       items: [
         {
           type: 'docSidebar',
@@ -92,7 +97,9 @@ const config: Config = {
           position: 'right',
         },
       ],
+      */
     },
+    /*
     footer: {
       style: 'dark',
       links: [
@@ -138,11 +145,39 @@ const config: Config = {
       ],
       copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
     },
+    */
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
   } satisfies Preset.ThemeConfig,
+  themes: [
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        // ... Your options.
+        // `hashed` is recommended as long-term-cache of index file is possible.
+        hashed: true,
+        indexBlog: false,
+        indexDocs: true,
+        indexPages: false,
+        // This is key - since you have docs: { routeBasePath: '/' }
+        docsRouteBasePath: "/", 
+        // Explicitly set the docs directory
+        docsDir: ["docs"],
+        // For Docs using Chinese, it is recomended to set:
+        // language: ["en", "zh"],
+
+        // Customize the keyboard shortcut to focus search bar (default is "mod+k"):
+        // searchBarShortcutKeymap: "s", // Use 'S' key
+        // searchBarShortcutKeymap: "ctrl+shift+f", // Use Ctrl+Shift+F
+
+        // If you're using `noIndex: true`, set `forceIgnoreNoIndex` to enable local index:
+        // forceIgnoreNoIndex: true,
+      }),
+    ],
+  ]
 };
 
 export default config;
