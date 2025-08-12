@@ -4,7 +4,7 @@ sidebar_position: 2
 title: "Getting Started with Moondream"
 ---
 
-This guide will help you set up Moondream in minutes using our free Cloud tier or running locally. For more advanced options, see our [advanced documentation](/c/docs/advanced).
+This guide will help you set up Moondream in minutes using our free Cloud tier or running locally. For more advanced options, see our [advanced documentation](https://moondream.ai/c/docs/advanced).
 
 ## Setup
 
