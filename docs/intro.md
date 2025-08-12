@@ -10,7 +10,7 @@ Moondream is a tiny open-source vision AI that brings powerful image understandi
 
 Interact with Moondream using simple, intuitive language without specialized machine learning expertise, making advanced vision AI accessible to developers of all backgrounds. As a vertically integrated model company, we deliver consistent visual understanding across our core capabilities while continuously evolving.
 
-Want to see Moondream in action? Try our [Interactive Playground](/c/playground) to experiment with different capabilities. Need help getting started? Join our [Discord community](https://discord.com/invite/tRUdpjDQfH) for support and discussions.
+Want to see Moondream in action? Try our [Interactive Playground](https://moondream.ai/c/playground) to experiment with different capabilities. Need help getting started? Join our [Discord community](https://discord.com/invite/tRUdpjDQfH) for support and discussions.
 
 ## Core Capabilities
 
