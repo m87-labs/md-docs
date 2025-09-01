@@ -72,7 +72,13 @@ const config: Config = {
   ],
 
   themeConfig: {
-    // Replace with your project's social card
+    // theme config should remain in dark mode because light mode doesn't have good colors
+    themeConfig: {
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: true,
+      }
+    },
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
       title: 'Moondream Docs',
