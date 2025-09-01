@@ -93,3 +93,6 @@ print(greeting)
 
 ### Modifying aesthetics
 In order to change the look of the website, you can adjust the themes inside docusaurus.config.ts or you can modify CSS inside custom.css. Docusaurus uses custom flags that can be identified from the inspect menu, in order to properly change the colors. 
+
+### Modifying the URL
+If you change the URL of the site, make sure to update docusaurus.config.ts (both url and BaseURL) to match it. It needs to be the correct URL in order to build properly.
