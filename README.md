@@ -39,3 +39,57 @@ GIT_USER=<Your GitHub username> yarn deploy
 ```
 
 If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+
+## Modifying the content
+To add a doc, simply create a .md file inside the docs folder and add the content you want. It will automatically be compiled and added to the website.
+
+To add a category/folder, it's the same process. Create the folder inside docs and it will add it automatically.
+
+For code documentation, here is an example of adding code to the markdown:
+
+# Code Block Examples
+
+### Code Tabs
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="js" label="JavaScript" default>
+  
+  ```javascript
+  const greeting = "Hello, World!";
+  console.log(greeting);
+  ```
+  
+  </TabItem>
+  <TabItem value="py" label="Python">
+  
+  ```python
+  greeting = "Hello, World!"
+  print(greeting)
+  ```
+  
+  </TabItem>
+  <TabItem value="java" label="Java">
+  
+  ```java
+  public class HelloWorld {
+      public static void main(String[] args) {
+          System.out.println("Hello, World!");
+      }
+  }
+  ```
+  
+  </TabItem>
+</Tabs>
+
+### Standard
+
+```python
+greeting = "Hello, World!"
+print(greeting)
+```
+
+### Modifying aesthetics
+In order to change the look of the website, you can adjust the themes inside docusaurus.config.ts or you can modify CSS inside custom.css. Docusaurus uses custom flags that can be identified from the inspect menu, in order to properly change the colors. 
