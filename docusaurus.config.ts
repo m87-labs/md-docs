@@ -1,5 +1,5 @@
-import {themes as prismThemes} from 'prism-react-renderer';
-import type {Config} from '@docusaurus/types';
+import { themes as prismThemes } from 'prism-react-renderer';
+import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
@@ -22,7 +22,7 @@ const config: Config = {
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
-  organizationName: 'lumal-code', // Usually your GitHub org/user name.
+  organizationName: 'm87-labs', // Usually your GitHub org/user name.
   projectName: 'md-docs', // Usually your repo name.
 
   onBrokenLinks: 'throw',
@@ -46,7 +46,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/lumal-code/md-docs/docs/',
+            'https://github.com/m87-labs/md-docs/docs/',
         },
         blog: false,
         /*{
@@ -169,7 +169,7 @@ const config: Config = {
         indexDocs: true,
         indexPages: false,
         // This is key - since you have docs: { routeBasePath: '/' }
-        docsRouteBasePath: "/", 
+        docsRouteBasePath: "/",
         // Explicitly set the docs directory
         docsDir: ["docs"],
         // For Docs using Chinese, it is recomended to set:
