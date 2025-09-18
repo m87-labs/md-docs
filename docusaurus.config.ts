@@ -72,10 +72,12 @@ const config: Config = {
   ],
 
   themeConfig: {
-    colorMode: {
-      defaultMode: 'dark',
-      disableSwitch: false,
-      respectPrefersColorScheme: true,
+    // theme config should remain in dark mode because light mode doesn't have good colors
+    themeConfig: {
+      colorMode: {
+        defaultMode: 'dark',
+        disableSwitch: true,
+      }
     },
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
