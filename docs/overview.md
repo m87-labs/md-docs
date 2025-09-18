@@ -22,7 +22,7 @@ This distribution includes Model Weights licensed under the [Business Source Lic
 **Learn More:**
 - Try the [interactive demo](https://moondream.ai/c/playground)
 - [Full technical specifications](https://huggingface.co/moondream/moondream3-preview) for Moondream 3
-- Browse [legacy models](https://huggingface.co/moondream/models) for previous versions
+- Browse [legacy versions](https://huggingface.co/moondream/models) of Moondream
 - Get started with our [Getting Started](./quickstart) guide
 
 
