@@ -14,7 +14,9 @@ It's quicker since there's no download:
 
 1. Create an API key at the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys) (free tier available, no credit card required)
 2. Copy and save your API key (you'll need it for the code examples below)
-3. See our [API documentation](https://moondream.ai/c/docs/advanced/api) for detailed usage instructions
+3. Include your API key in the request headers as X-Moondream-Auth: YOUR_API_KEY
+4. Send your request using JSON format to the appropriate endpoint
+5. Process the JSON response according to your application needs
 
 ### Option B: Local 
 
