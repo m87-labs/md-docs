@@ -1,14 +1,12 @@
 ---
 slug: "/"
 sidebar_position: 2
-title: "Getting Started with Moondream"
+title: "Getting Started"
 ---
 
-This guide will help you set up Moondream in minutes using our free Cloud tier or running locally. For more advanced options, see our [advanced documentation](https://moondream.ai/c/docs/advanced).
+Moondream is a powerful, fast, and efficient vision AI model. It can answer questions, detect objects, count and point, caption, perform OCR, and more.
 
-## Setup
-
-You need to choose **one** of these two options: cloud or local. Both are free options.
+To use it, you can access it with our Cloud API or by running locally.
 
 ### Option A: Cloud
 

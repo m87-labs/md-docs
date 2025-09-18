@@ -1,89 +1,41 @@
 /**
- * Simple Black & White Docusaurus Theme
- * Easy to customize by changing the color variables
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
  */
 
-/* Theme Colors - Change these to customize */
+/* You can override the default Infima variables here. */
 :root {
-  --bg: #000000;           /* Main background */
-  --bg-light: #1a1a1a;     /* Cards, code blocks */
-  --bg-hover: #222222;     /* Hover backgrounds */
+  --ifm-color-primary: #0066cc;
+  --ifm-color-primary-dark: #0052a3;
+  --ifm-color-primary-darker: #004d99;
+  --ifm-color-primary-darkest: #003d7a;
+  --ifm-color-primary-light: #1a75d6;
+  --ifm-color-primary-lighter: #3385db;
+  --ifm-color-primary-lightest: #66a3e6;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   
-  --text: #cccccc;         /* Main text */
-  --text-dim: #999999;     /* Secondary text */
-  
-  --accent: #ffffff;       /* Links, highlights */
-  --accent-dim: #e6e6e6;   /* Hover states */
-  
-  --border: #333333;       /* Borders */
-
-  /* Apply to Docusaurus variables */
-  --ifm-color-primary: var(--accent);
-  --ifm-color-primary-dark: var(--accent-dim);
-  --ifm-color-primary-darker: var(--accent-dim);
-  --ifm-color-primary-light: var(--accent);
-  --ifm-color-primary-lighter: var(--accent);
-
-  --ifm-background-color: var(--bg);
-  --ifm-background-surface-color: var(--bg-light);
-  
-  --ifm-font-color-base: var(--text);
-  --ifm-font-color-secondary: var(--text-dim);
-  
-  --ifm-link-color: var(--accent);
-  --ifm-link-hover-color: var(--accent);
-  
-  --ifm-navbar-background-color: var(--bg);
-  --ifm-code-background: var(--bg-light);
-  --ifm-color-emphasis-200: var(--border);
-  --ifm-table-border-color: var(--border);
-  --ifm-blockquote-border-color: var(--accent);
+  /* Link colors */
+  --ifm-link-color: #0066cc;
+  --ifm-link-hover-color: #0052a3;
 }
 
-/* Dark mode same as light mode */
+/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: var(--accent);
-  --ifm-background-color: var(--bg);
-  --ifm-background-surface-color: var(--bg-light);
-  --ifm-font-color-base: var(--text);
-  --ifm-link-color: var(--accent);
-}
-
-/* Links underlined */
-.theme-doc-markdown a {
-  text-decoration: underline;
-}
-
-/* Navbar */
-.navbar__title {
-  color: var(--accent) !important;
-}
-
-.navbar__item.navbar__link {
-  color: var(--text) !important;
-}
-
-.navbar__item.navbar__link:hover {
-  color: var(--accent) !important;
-}
-
-/* Sidebar */
-.menu__link {
-  color: var(--text) !important;
-}
-
-.menu__link:hover,
-.menu__link--active {
-  color: var(--accent) !important;
-  background-color: var(--bg-hover) !important;
-}
-
-/* Search results hover fix */
-[class*="suggestion_"][class*="cursor_"] {
-  background-color: var(--bg-hover) !important;
-  color: var(--accent) !important;
-}
-
-[class*="suggestion_"][class*="cursor_"] * {
-  color: var(--accent) !important;
+  --ifm-color-primary: #66b3ff;
+  --ifm-color-primary-dark: #4da6ff;
+  --ifm-color-primary-darker: #3399ff;
+  --ifm-color-primary-darkest: #0080ff;
+  --ifm-color-primary-light: #80c1ff;
+  --ifm-color-primary-lighter: #99ccff;
+  --ifm-color-primary-lightest: #b3d9ff;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  
+  /* Link colors for dark mode */
+  --ifm-link-color: #66b3ff;
+  --ifm-link-hover-color: #4da6ff;
+  
+  /* Fix search icon in dark mode by providing a light-colored version */
+  --ifm-navbar-search-input-icon: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="16px" width="16px"><path d="M6.02945,10.20327a4.17382,4.17382,0,1,1,4.17382-4.17382A4.15609,4.15609,0,0,1,6.02945,10.20327Zm9.69195,4.2199L10.8989,9.59979A5.88021,5.88021,0,0,0,12.058,6.02856,6.00467,6.00467,0,1,0,9.59979,10.8989l4.82338,4.82338a.89729.89729,0,0,0,1.29912,0,.89749.89749,0,0,0-.00087-1.29909Z" /></svg>');
 }
