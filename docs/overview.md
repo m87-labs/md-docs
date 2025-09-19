@@ -6,16 +6,16 @@ title: "Overview"
 
 # Overview
 
-Our latest model, **Moondream 3**, is a vision language model with a mixture-of-experts architecture (9B total parameters, 2B active). This model makes no compromises, delivering state-of-the-art visual reasoning while still retaining our efficient and deployment-friendly ethos.
+Moondream is a family of open source Vision Language Models (VLMs) that provide advanced visual reasoning in a tiny, efficient footprint. Our latest model, **Moondream 3 Preview** has a mixture-of-experts architecture (9B total parameters, 2B active). This model makes no compromises, delivering state-of-the-art visual reasoning while still retaining our efficient and deployment-friendly ethos.
 
-Moondream 3 is now the default model for our cloud API and local processing with Moondream Station – [get started here](./quickstart).
+Moondream 3 Preview is now the default model for our cloud API and local processing with Moondream Station – [get started here](./quickstart).
 
 ### Key stats
-- 9 billion total parameters
-- 2 billion active parameters (maintains similar inference speeds to our previous models)
+- 9B total params, 2B active params (maintains similar inference speeds to our previous models)
 - 32k context window (up from 2k)
 
 ### Model Skills
+Moondream has built-in vision-specific skills that make it easy to generate specific types of vision outputs (e.g., bounding boxes, or 2D points). These are:
 - Object Detection
 - Pointing and Counting
 - Visual Question Answering
