@@ -46,7 +46,7 @@ const config: Config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/m87-labs/md-docs/docs/',
+            'https://github.com/m87-labs/md-docs/edit/main/',
         },
         blog: false,
         /*{
