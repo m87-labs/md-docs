@@ -117,11 +117,13 @@ curl -X POST https://api.moondream.ai/v1/point \
 - `/detect` returns bounding boxes (x_min, y_min, x_max, y_max)
 
 Use `/point` when you need:
+
 - Precise object center points
 - Simpler data for plotting
 - Multiple instance counting
 
 Use `/detect` when you need:
+
 - Object size information
 - Visual highlighting of complete objects
 - Cropping regions of interest
@@ -129,6 +131,6 @@ Use `/detect` when you need:
 ---
 
 **Learn More:**
-- View the full [Point API documentation](https://moondream.ai/c/docs/advanced/api/point)
+
 - Try the [interactive playground](https://moondream.ai/c/playground) to test pointing
 - Explore [code examples](https://github.com/m87-labs/moondream-examples) in multiple languages

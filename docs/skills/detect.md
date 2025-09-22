@@ -128,6 +128,7 @@ curl -X POST https://api.moondream.ai/v1/detect \
 ## Common Object Types
 
 Moondream can detect a wide range of objects:
+
 - person, face, car, dog, cat
 - building, furniture, text, food, plant
 
@@ -136,6 +137,6 @@ Moondream can detect a wide range of objects:
 ---
 
 **Learn More:**
-- View the full [Detect API documentation](https://moondream.ai/c/docs/advanced/api/detect)
+
 - Try the [interactive playground](https://moondream.ai/c/playground) to test detection
 - Explore [code examples](https://github.com/m87-labs/moondream-examples) in multiple languages

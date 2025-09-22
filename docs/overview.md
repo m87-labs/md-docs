@@ -11,11 +11,14 @@ Moondream is an open-source family of Vision Language Models (VLMs) built for po
 Moondream 3 Preview is now the default model for our cloud API and local processing with Moondream Station – [get started here](./quickstart).
 
 ### Key stats
+
 - 9B total params, 2B active params (maintains similar inference speeds to our previous models)
 - 32k context window (up from 2k)
 
 ### Model Skills
+
 Moondream has built-in vision-specific skills that make it easy to generate specific types of vision outputs (e.g., bounding boxes, or 2D points). These are:
+
 - Object Detection
 - Pointing and Counting
 - Visual Question Answering
@@ -40,18 +43,15 @@ Here are some early benchmark results. We show it alongside some top frontier mo
 | pope | **89.0** | 88.4 | 88.1 | 84.6 |
 
 ### License
+
 Copyright (c) 2025 M87 Labs, Inc.
 This distribution includes Model Weights licensed under the [Business Source License 1.1](https://mariadb.com/bsl11/) with an [Additional Use Grant](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE) (No Third-Party Service). Commercial hosting or rehosting requires an agreement with [contact@m87.ai](mailto:contact@m87.ai).
 
 ---
 
 ### Learn more
+
 - Try the [interactive demo](https://moondream.ai/c/playground)
 - [Full technical specifications](https://huggingface.co/moondream/moondream3-preview) for Moondream 3
 - Browse [legacy versions](https://huggingface.co/moondream/models) of Moondream
 - Get started with our [Getting Started](./quickstart) guide
-
-
-
-
-

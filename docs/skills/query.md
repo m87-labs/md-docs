@@ -94,12 +94,12 @@ curl -X POST https://api.moondream.ai/v1/query \
 
 - Ask specific questions rather than general ones
 - One question at a time yields better results than multiple questions
-- For complex scenes, try to focus on particular areas or objects
 - If you want detailed answers, explicitly ask for details in your question
+- Moondream can produce structured outputs. For example: "describe people in the image using JSON with keys 'hair_color', 'shirt_color', 'person_type'"
 
 ---
 
 **Learn More:**
-- View the full [Query API documentation](https://moondream.ai/c/docs/advanced/api/query)
+
 - Try the [interactive playground](https://moondream.ai/c/playground) to test queries
 - Explore [code examples](https://github.com/m87-labs/moondream-examples) in multiple languages

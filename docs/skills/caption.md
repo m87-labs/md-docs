@@ -181,6 +181,6 @@ Error responses are returned in the following format:
 ---
 
 **Learn More:**
-- View the full [Caption API documentation](https://moondream.ai/c/docs/advanced/api/caption)
+
 - Try the [interactive playground](https://moondream.ai/c/playground) to test captioning
 - Explore [code examples](https://github.com/m87-labs/moondream-examples) in multiple languages
