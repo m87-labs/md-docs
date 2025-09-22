@@ -30,7 +30,7 @@ We don't have a Windows version yet. If you're on Windows, we recommend using th
 
 Once you have either a Moondream Cloud API key or Moondream running locally, check out our [**Moondream Examples**](https://github.com/m87-labs/moondream-examples) repo for sample code to get you started. The examples work with our Python and Node clients, as well as Bash using cURL.
 
-Each Moondream capability has its own method or function. In this example we've used `caption`, but Moondream also supports `query`, `point`, and `detect`. Learn more about these capabilities in our [capabilities documentation](https://moondream.ai/c/docs/capabilities).
+Each Moondream skill has its own method or function. In this example we've used `caption`, but Moondream also supports `query`, `point`, and `detect`.
 
 ---
 
