@@ -22,7 +22,7 @@ It's quicker since there's no download:
 You have two main options for running Moondream locally:
 
 1. Mac/Linux: Use [Moondream Station](https://moondream.ai/station), the easiest way to run Moondream locally
-2. Advanced: Use Hugging Face transformers directly - [Instructions](https://moondream.ai/c/docs/advanced/transformers)
+2. Advanced: using Hugging Face with transformers - [Instructions](https://docs.moondream.ai/advanced/transformers)
 
 We don't have a Windows version yet. If you're on Windows, we recommend using the cloud option.
 
