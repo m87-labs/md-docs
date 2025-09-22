@@ -45,7 +45,7 @@ Here are some early benchmark results. We show it alongside some top frontier mo
 ### License
 
 Copyright (c) 2025 M87 Labs, Inc.
-This distribution includes Model Weights licensed under the [Business Source License 1.1](https://mariadb.com/bsl11/) with an [Additional Use Grant](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE) (No Third-Party Service). Commercial hosting or rehosting requires an agreement with [contact@m87.ai](mailto:contact@m87.ai).
+This distribution includes Model Weights licensed under the [Business Source License 1.1](https://mariadb.com/bsl11/) with an [Additional Use Grant](https://huggingface.co/moondream/moondream3-preview/blob/main/LICENSE.md) (No Third-Party Service). Commercial hosting or rehosting requires an agreement with [contact@m87.ai](mailto:contact@m87.ai).
 
 ---
 
