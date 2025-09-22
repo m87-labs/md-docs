@@ -39,4 +39,3 @@ Each Moondream skill has its own method or function. In this example we've used 
 - Explore [Python SDK Documentation](https://pypi.org/project/moondream/)
 - Check out [Node.js SDK Documentation](https://www.npmjs.com/package/moondream)
 - Try our [interactive playground](https://moondream.ai/c/playground) to test Moondream without coding
-- Learn about advanced features in our [API documentation](https://moondream.ai/c/docs/advanced/api)
