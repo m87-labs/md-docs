@@ -1,6 +1,7 @@
 ---
-title: Skills
-sidebar_position: 1
+title: Skills Overview
+sidebar_label: Overview
+sidebar_position: 0
 ---
 
 # Skills
