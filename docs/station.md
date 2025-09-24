@@ -2,8 +2,6 @@
 
 **Moondream Station: Local Visual Reasoning**
 
-![Video showing Moondream Station running in a terminal](https://raw.githubusercontent.com/m87-labs/moondream-station/55878b16dd3a675a9ccf9a292975aee97d055beb/assets/md_station_demo.gif)
-
 ## How It Works
 
 🚀 **Launches Local Server**  
@@ -59,6 +57,8 @@ We like to think Moondream has 20/20 vision; that's why, by default, we launch M
 - `restart` - Restart server
 
 ### Inference
+
+![Video showing Moondream Station running in a terminal](https://raw.githubusercontent.com/m87-labs/moondream-station/55878b16dd3a675a9ccf9a292975aee97d055beb/assets/md_station_demo.gif)
 
 **Access via HTTP**: Point any of our inference clients at your Moondream Station; for example, with our python client you can do:
 
