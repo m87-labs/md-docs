@@ -8,14 +8,14 @@ description: Usage-based pricing for Moondream Cloud, including token rates, inc
 
 # Cloud pricing
 
-Our Standard plan keeps Moondream Cloud accessible to teams that want to scale usage without negotiations. Pricing follows a pay-as-you-go model that mirrors how leading API platforms such as OpenAI present their offerings, with clear token rates and benefit callouts to help you estimate spend confidently.
+Moondream runs anywhere. For the easiest, fastest, and cheapest way to use it, with no setup required, there’s Moondream Cloud.
 
 ## Standard plan
 
 ### Usage model
 
-- Usage-based billing with separate accounting for input and output tokens.
-- Charges accrue automatically as you send requests; no minimum commitment.
+- Usage-based billing based on tokens.
+- Pay-as-you-go. Charges accrue automatically as you send requests; no minimum commitment.
 - Dense grounding tokens ensure grounding-heavy prompts stay efficient.
 
 ### Token rates
