@@ -138,26 +138,24 @@ pip install moondream
 
 ### Code Examples
 
-**Initialize the client:**
-
-```python
-from moondream import Moondream
-
-# Initialize with your API key
-client = Moondream(api_key="YOUR_API_KEY")
-```
-
 <Tabs groupId="api-method">
   <TabItem value="query" label="Query" default>
 
 **Visual Question Answering** - Ask natural language questions about images.
 
 ```python
-response = client.query(
-    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
-    question="What is in this image?"
-)
-print(response.answer)
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
+# Ask a question
+result = model.query(image, "What is in this image?")
+print(result["answer"])
 ```
 
   </TabItem>
@@ -166,12 +164,19 @@ print(response.answer)
 **Object Detection** - Identify and locate objects with bounding boxes.
 
 ```python
-response = client.detect(
-    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
-    object="moon"
-)
-for obj in response.objects:
-    print(f"Bounds: ({obj.x_min}, {obj.y_min}) to ({obj.x_max}, {obj.y_max})")
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
+# Detect objects
+result = model.detect(image, "moon")
+for obj in result["objects"]:
+    print(f"Bounds: ({obj['x_min']}, {obj['y_min']}) to ({obj['x_max']}, {obj['y_max']})")
 ```
 
   </TabItem>
@@ -180,12 +185,19 @@ for obj in response.objects:
 **Object Pointing** - Get precise center coordinates for objects.
 
 ```python
-response = client.point(
-    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
-    object="moon"
-)
-for point in response.points:
-    print(f"Center: ({point.x}, {point.y})")
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
+# Locate objects
+result = model.point(image, "moon")
+for point in result["points"]:
+    print(f"Center: ({point['x']}, {point['y']})")
 ```
 
   </TabItem>
@@ -194,11 +206,18 @@ for point in response.points:
 **Image Captioning** - Generate natural language descriptions of images.
 
 ```python
-response = client.caption(
-    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
-    length="normal"
-)
-print(response.caption)
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
+# Generate a caption
+result = model.caption(image, length="normal")
+print(result["caption"])
 ```
 
   </TabItem>
@@ -217,26 +236,27 @@ npm install moondream
 
 ### Code Examples
 
-**Initialize the client:**
-
-```javascript
-import { Moondream } from 'moondream';
-
-// Initialize with your API key
-const client = new Moondream({ apiKey: 'YOUR_API_KEY' });
-```
-
 <Tabs groupId="api-method">
   <TabItem value="query" label="Query" default>
 
 **Visual Question Answering** - Ask natural language questions about images.
 
 ```javascript
-const response = await client.query({
-  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
+
+// Ask a question
+const result = await model.query({
+  image: image,
   question: 'What is in this image?'
 });
-console.log(response.answer);
+console.log(result.answer);
 ```
 
   </TabItem>
@@ -245,12 +265,22 @@ console.log(response.answer);
 **Object Detection** - Identify and locate objects with bounding boxes.
 
 ```javascript
-const response = await client.detect({
-  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
+
+// Detect objects
+const result = await model.detect({
+  image: image,
   object: 'moon'
 });
-response.objects.forEach(obj => {
-  console.log(`Bounds: (${obj.xMin}, ${obj.yMin}) to (${obj.xMax}, ${obj.yMax})`);
+result.objects.forEach(obj => {
+  console.log(`Bounds: (${obj.x_min}, ${obj.y_min}) to (${obj.x_max}, ${obj.y_max})`);
 });
 ```
 
@@ -260,11 +290,21 @@ response.objects.forEach(obj => {
 **Object Pointing** - Get precise center coordinates for objects.
 
 ```javascript
-const response = await client.point({
-  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
+
+// Locate objects
+const result = await model.point({
+  image: image,
   object: 'moon'
 });
-response.points.forEach(point => {
+result.points.forEach(point => {
   console.log(`Center: (${point.x}, ${point.y})`);
 });
 ```
@@ -275,11 +315,21 @@ response.points.forEach(point => {
 **Image Captioning** - Generate natural language descriptions of images.
 
 ```javascript
-const response = await client.caption({
-  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
+
+// Generate a caption
+const result = await model.caption({
+  image: image,
   length: 'normal'
 });
-console.log(response.caption);
+console.log(result.caption);
 ```
 
   </TabItem>

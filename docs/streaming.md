@@ -26,68 +26,90 @@ Streaming lets you receive AI responses as they're being generated, word-by-word
 <Tabs>
   <TabItem value="python" label="Python" default>
 
-The Python SDK handles streaming automatically:
+[View Python SDK Documentation →](https://pypi.org/project/moondream/)
 
-```python {9}
-from moondream import Moondream
+### Query
 
-client = Moondream(api_key="YOUR_API_KEY")
+```python
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
 
 # Stream a query response
-for chunk in client.query(
-    image_url="data:image/jpeg;base64,...",
-    question="What is in this image?",
-    stream=True
-):
-    print(chunk.text, end="", flush=True)
+for chunk in model.query(image, question="What is in this image?", stream=True)["answer"]:
+    print(chunk, end="", flush=True)
 ```
 
-For captions:
+### Caption
 
-```python {5}
+```python
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
 # Stream a caption
-for chunk in client.caption(
-    image_url="data:image/jpeg;base64,...",
-    length="normal",
-    stream=True
-):
-    print(chunk.text, end="", flush=True)
+for chunk in model.caption(image, stream=True)["caption"]:
+    print(chunk, end="", flush=True)
 ```
 
   </TabItem>
   <TabItem value="nodejs" label="Node.js">
 
-The Node.js SDK handles streaming automatically:
+[View Node.js SDK Documentation →](https://www.npmjs.com/package/moondream)
 
-```javascript {9}
-import { Moondream } from 'moondream';
+### Query
 
-const client = new Moondream({ apiKey: 'YOUR_API_KEY' });
+```javascript
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Stream a query response
-const stream = await client.query({
-  imageUrl: 'data:image/jpeg;base64,...',
+const stream = await model.query({
+  image: image,
   question: 'What is in this image?',
   stream: true
 });
-
-for await (const chunk of stream) {
-  process.stdout.write(chunk.text);
+for await (const chunk of stream.answer) {
+  process.stdout.write(chunk);
 }
 ```
 
-For captions:
+### Caption
 
-```javascript {5}
+```javascript
+import { vl } from 'moondream';
+import fs from 'fs';
+
+// Initialize with your API key
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const image = fs.readFileSync('path/to/image.jpg');
+
 // Stream a caption
-const stream = await client.caption({
-  imageUrl: 'data:image/jpeg;base64,...',
+const stream = await model.caption({
+  image: image,
   length: 'normal',
   stream: true
 });
-
-for await (const chunk of stream) {
-  process.stdout.write(chunk.text);
+for await (const chunk of stream.caption) {
+  process.stdout.write(chunk);
 }
 ```
 
