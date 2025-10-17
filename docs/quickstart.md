@@ -3,39 +3,302 @@ sidebar_position: 2
 title: "Getting Started"
 ---
 
-Moondream is a powerful, fast, and efficient vision AI model. It can answer questions, detect objects, count and point, caption, perform OCR, and more.
+Moondream is a powerful, fast, and efficient vision AI model. It can answer questions, detect objects, count and point, caption, perform OCR, and more.  Grab an API key at the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys) and try it out!
 
-To use it, you can access it with our Cloud API or by running locally.
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-### Option A: Cloud
+<Tabs>
+  <TabItem value="query" label="Query" default>
 
-It's quicker since there's no download:
+**Visual Question Answering** - Ask natural language questions about images.
 
-1. Create an API key at the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys) (free tier available, no credit card required)
-2. Copy and save your API key (you'll need it for the code examples below)
-3. Include your API key in the request headers as X-Moondream-Auth: YOUR_API_KEY
-4. Send your request using JSON format to the appropriate endpoint
-5. Process the JSON response according to your application needs
+```bash
+curl -X POST https://api.moondream.ai/v1/query \
+  -H 'Content-Type: application/json' \
+  -H 'X-Moondream-Auth: YOUR_API_KEY' \
+  -d '{
+    "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
+    "question": "What is in this image?"
+  }'
+```
 
-### Option B: Local 
+**Response:**
+```json
+{
+  "request_id": "2025-03-25_query_2025-03-25-21:00:39-715d03",
+  "answer": "The image is a grayscale depiction of a crescent moon against a black background. The moon is rendered in varying shades of gray, appearing as a smooth, curved shape with no visible craters or details."
+}
+```
 
-You have two main options for running Moondream locally:
+  </TabItem>
+  <TabItem value="detect" label="Detect">
 
-1. Mac/Linux: Use [Moondream Station](/station), the easiest way to run Moondream locally
-2. Advanced: using Hugging Face with transformers - [Instructions](https://docs.moondream.ai/advanced/transformers)
+**Object Detection** - Identify and locate objects with bounding boxes.
 
-We don't have a Windows version yet. If you're on Windows, we recommend using the cloud option.
+```bash
+curl -X POST https://api.moondream.ai/v1/detect \
+  -H 'Content-Type: application/json' \
+  -H 'X-Moondream-Auth: YOUR_API_KEY' \
+  -d '{
+    "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
+    "object": "moon"
+  }'
+```
 
-## Code
+**Response:**
+```json
+{
+  "request_id": "2025-03-25_detect_2025-03-25-21:00:39-715d03",
+  "objects": [
+    {
+      "x_min": 0.2,
+      "y_min": 0.3,
+      "x_max": 0.6,
+      "y_max": 0.8
+    }
+  ]
+}
+```
 
-Once you have either a Moondream Cloud API key or Moondream running locally, check out our [**Moondream Examples**](https://github.com/m87-labs/moondream-examples) repo for sample code to get you started. The examples work with our Python and Node clients, as well as Bash using cURL.
+  </TabItem>
+  <TabItem value="point" label="Point">
 
-Each Moondream skill has its own method or function. In this example we've used `caption`, but Moondream also supports `query`, `point`, and `detect`.
+**Object Pointing** - Get precise center coordinates for objects.
 
----
+```bash
+curl -X POST https://api.moondream.ai/v1/point \
+  -H 'Content-Type: application/json' \
+  -H 'X-Moondream-Auth: YOUR_API_KEY' \
+  -d '{
+    "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
+    "object": "moon"
+  }'
+```
+
+**Response:**
+```json
+{
+  "request_id": "2025-03-25_point_2025-03-25-21:00:39-715d03",
+  "points": [
+    {
+      "x": 0.65,
+      "y": 0.42
+    }
+  ]
+}
+```
+
+  </TabItem>
+  <TabItem value="caption" label="Caption">
+
+**Image Captioning** - Generate natural language descriptions of images.
+
+```bash
+curl -X POST https://api.moondream.ai/v1/caption \
+  -H 'Content-Type: application/json' \
+  -H 'X-Moondream-Auth: YOUR_API_KEY' \
+  -d '{
+    "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
+    "length": "normal",
+    "stream": false
+  }'
+```
+
+**Response:**
+```json
+{
+  "caption": "A crescent moon shape is centered against a solid black background. The crescent is oriented with its convex side facing right and its concave side facing left. The image is monochromatic, with shades of gray and white. No other objects, patterns, or text are visible.",
+  "metrics": {
+    "input_tokens": 735,
+    "output_tokens": 45,
+    "prefill_time_ms": 43.51004003547132,
+    "decode_time_ms": 415.3184471651912,
+    "ttft_ms": 81.97528193704784
+  },
+  "finish_reason": "stop"
+}
+```
+
+  </TabItem>
+</Tabs>
+
+## Moondream SDK
+
+<Tabs>
+  <TabItem value="python" label="Python" default>
+
+### Installation
+
+```bash
+pip install moondream
+```
+
+[View Python SDK Documentation →](https://pypi.org/project/moondream/)
+
+### Code Examples
+
+**Initialize the client:**
+
+```python
+from moondream import Moondream
+
+# Initialize with your API key
+client = Moondream(api_key="YOUR_API_KEY")
+```
+
+<Tabs groupId="api-method">
+  <TabItem value="query" label="Query" default>
+
+**Visual Question Answering** - Ask natural language questions about images.
+
+```python
+response = client.query(
+    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
+    question="What is in this image?"
+)
+print(response.answer)
+```
+
+  </TabItem>
+  <TabItem value="detect" label="Detect">
+
+**Object Detection** - Identify and locate objects with bounding boxes.
+
+```python
+response = client.detect(
+    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
+    object="moon"
+)
+for obj in response.objects:
+    print(f"Bounds: ({obj.x_min}, {obj.y_min}) to ({obj.x_max}, {obj.y_max})")
+```
+
+  </TabItem>
+  <TabItem value="point" label="Point">
+
+**Object Pointing** - Get precise center coordinates for objects.
+
+```python
+response = client.point(
+    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
+    object="moon"
+)
+for point in response.points:
+    print(f"Center: ({point.x}, {point.y})")
+```
+
+  </TabItem>
+  <TabItem value="caption" label="Caption">
+
+**Image Captioning** - Generate natural language descriptions of images.
+
+```python
+response = client.caption(
+    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
+    length="normal"
+)
+print(response.caption)
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+  <TabItem value="nodejs" label="Node.js">
+
+### Installation
+
+```bash
+npm install moondream
+```
+
+[View Node.js SDK Documentation →](https://www.npmjs.com/package/moondream)
+
+### Code Examples
+
+**Initialize the client:**
+
+```javascript
+import { Moondream } from 'moondream';
+
+// Initialize with your API key
+const client = new Moondream({ apiKey: 'YOUR_API_KEY' });
+```
+
+<Tabs groupId="api-method">
+  <TabItem value="query" label="Query" default>
+
+**Visual Question Answering** - Ask natural language questions about images.
+
+```javascript
+const response = await client.query({
+  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+  question: 'What is in this image?'
+});
+console.log(response.answer);
+```
+
+  </TabItem>
+  <TabItem value="detect" label="Detect">
+
+**Object Detection** - Identify and locate objects with bounding boxes.
+
+```javascript
+const response = await client.detect({
+  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+  object: 'moon'
+});
+response.objects.forEach(obj => {
+  console.log(`Bounds: (${obj.xMin}, ${obj.yMin}) to (${obj.xMax}, ${obj.yMax})`);
+});
+```
+
+  </TabItem>
+  <TabItem value="point" label="Point">
+
+**Object Pointing** - Get precise center coordinates for objects.
+
+```javascript
+const response = await client.point({
+  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+  object: 'moon'
+});
+response.points.forEach(point => {
+  console.log(`Center: (${point.x}, ${point.y})`);
+});
+```
+
+  </TabItem>
+  <TabItem value="caption" label="Caption">
+
+**Image Captioning** - Generate natural language descriptions of images.
+
+```javascript
+const response = await client.caption({
+  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
+  length: 'normal'
+});
+console.log(response.caption);
+```
+
+  </TabItem>
+</Tabs>
+
+  </TabItem>
+</Tabs>
+
+**More Examples**: Check out our [Moondream Examples](https://github.com/m87-labs/moondream-examples) repo for complete projects and use cases.
+
+## Running Locally
+
+Want to run Moondream on your own hardware instead of using the Cloud API?
+
+- **Mac/Linux**: Use [Moondream Station](/station) - the easiest way to run locally
+- **Advanced**: Use [Hugging Face Transformers](/advanced/transformers) for custom integration
 
 ## Next Steps
 
-- Explore [Python SDK Documentation](https://pypi.org/project/moondream/)
-- Check out [Node.js SDK Documentation](https://www.npmjs.com/package/moondream)
-- Try our [interactive playground](https://moondream.ai/c/playground) to test Moondream without coding
+- **Try it live**: Use our [interactive playground](https://moondream.ai/c/playground) to test without coding
+- **Deep dive**: Explore detailed documentation for each skill - [Query](/skills/query), [Detect](/skills/detect), [Point](/skills/point), [Caption](/skills/caption)
+- **More capabilities**: Check out all [Moondream Skills](/skills/)

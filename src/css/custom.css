@@ -15,7 +15,7 @@
   --ifm-color-primary-lightest: #66a3e6;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  
+
   /* Link colors */
   --ifm-link-color: #0066cc;
   --ifm-link-hover-color: #0052a3;
@@ -31,11 +31,27 @@
   --ifm-color-primary-lighter: #99ccff;
   --ifm-color-primary-lightest: #b3d9ff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
-  
+
   /* Link colors for dark mode */
   --ifm-link-color: #66b3ff;
   --ifm-link-hover-color: #4da6ff;
-  
+
+  /* Darker backgrounds - matching navbar darkness */
+  --ifm-background-color: #010409;
+  --ifm-background-surface-color: #0d1117;
+
+  /* Darker navbar and footer */
+  --ifm-navbar-background-color: #010409;
+  --ifm-footer-background-color: #010409;
+
+  /* Adjust card/container colors */
+  --ifm-color-emphasis-100: #21262d;
+  --ifm-color-emphasis-200: #30363d;
+  --ifm-color-emphasis-300: #484f58;
+
+  /* Code blocks darker */
+  --ifm-code-background: #161b22;
+
   /* Fix search icon in dark mode by providing a light-colored version */
   --ifm-navbar-search-input-icon: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" height="16px" width="16px"><path d="M6.02945,10.20327a4.17382,4.17382,0,1,1,4.17382-4.17382A4.15609,4.15609,0,0,1,6.02945,10.20327Zm9.69195,4.2199L10.8989,9.59979A5.88021,5.88021,0,0,0,12.058,6.02856,6.00467,6.00467,0,1,0,9.59979,10.8989l4.82338,4.82338a.89729.89729,0,0,0,1.29912,0,.89749.89749,0,0,0-.00087-1.29909Z" /></svg>');
 }
