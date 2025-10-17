@@ -7,7 +7,7 @@ export default function RateLimitsTable() {
                 <div className={styles.tableHeader}>
                     <div className={styles.headerCell}>Model</div>
                     <div className={styles.headerCell}>Base Tier</div>
-                    <div className={styles.headerCell}>Enhanced Tier</div>
+                    <div className={styles.headerCell}>Funded Account</div>
                 </div>
 
                 <div className={styles.tableBody}>
@@ -27,7 +27,7 @@ export default function RateLimitsTable() {
                                 <span className={styles.rateValue}>10</span>
                                 <span className={styles.rateUnit}>req/sec</span>
                             </div>
-                            <div className={styles.tierNote}>≥ $10 in paid credits</div>
+                            <div className={styles.tierNote}>≥ $10 account balance</div>
                         </div>
                     </div>
                 </div>
