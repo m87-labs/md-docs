@@ -33,6 +33,8 @@ import TabItem from '@theme/TabItem';
 <Tabs>
   <TabItem value="python" label="Python" default>
 
+[View Python SDK Documentation →](https://pypi.org/project/moondream/)
+
 ```python
 import moondream as md
 from PIL import Image
@@ -51,18 +53,24 @@ print(result["answer"])
   </TabItem>
   <TabItem value="nodejs" label="Node.js">
 
+[View Node.js SDK Documentation →](https://www.npmjs.com/package/moondream)
+
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with your API key
-const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
 
 // Load an image
-const imageBuffer = fs.readFileSync('path/to/image.jpg');
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Query with reasoning enabled
-const result = await model.query(imageBuffer, 'What is in this image?', { reasoning: true });
+const result = await model.query({
+  image: image,
+  question: 'What is in this image?',
+  reasoning: true
+});
 console.log(result.answer);
 ```
 

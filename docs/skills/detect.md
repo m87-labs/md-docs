@@ -70,26 +70,29 @@ plt.show()
 ```
 
   </TabItem>
-  <TabItem value="js" label="JavaScript">
+  <TabItem value="js" label="Node.js">
   
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with API key
-const model = moondream.vl({ apiKey: "your-api-key" });
+const model = new vl({ apiKey: "your-api-key" });
 
 // Load an image
-const imageBuffer = fs.readFileSync("path/to/image.jpg");
+const image = fs.readFileSync("path/to/image.jpg");
 
 // Detect objects
-const result = await model.detect(imageBuffer, "person");
+const result = await model.detect({
+  image: image,
+  object: "person"
+});
 console.log(`Found ${result.objects.length} people`);
 console.log(`Request ID: ${result.request_id}`);
 
 // Process the detections
 result.objects.forEach((obj, index) => {
-    console.log(`Person ${index + 1}: x_min=${obj.x_min}, y_min=${obj.y_min}, x_max=${obj.x_max}, y_max=${obj.y_max}`);
+  console.log(`Person ${index + 1}: x_min=${obj.x_min}, y_min=${obj.y_min}, x_max=${obj.x_max}, y_max=${obj.y_max}`);
 });
 ```
 

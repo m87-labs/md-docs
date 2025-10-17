@@ -242,17 +242,20 @@ npm install moondream
 **Visual Question Answering** - Ask natural language questions about images.
 
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with your API key
-const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
 
 // Load an image
-const imageBuffer = fs.readFileSync('path/to/image.jpg');
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Ask a question
-const result = await model.query(imageBuffer, 'What is in this image?');
+const result = await model.query({
+  image: image,
+  question: 'What is in this image?'
+});
 console.log(result.answer);
 ```
 
@@ -262,17 +265,20 @@ console.log(result.answer);
 **Object Detection** - Identify and locate objects with bounding boxes.
 
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with your API key
-const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
 
 // Load an image
-const imageBuffer = fs.readFileSync('path/to/image.jpg');
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Detect objects
-const result = await model.detect(imageBuffer, 'moon');
+const result = await model.detect({
+  image: image,
+  object: 'moon'
+});
 result.objects.forEach(obj => {
   console.log(`Bounds: (${obj.x_min}, ${obj.y_min}) to (${obj.x_max}, ${obj.y_max})`);
 });
@@ -284,17 +290,20 @@ result.objects.forEach(obj => {
 **Object Pointing** - Get precise center coordinates for objects.
 
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with your API key
-const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
 
 // Load an image
-const imageBuffer = fs.readFileSync('path/to/image.jpg');
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Locate objects
-const result = await model.point(imageBuffer, 'moon');
+const result = await model.point({
+  image: image,
+  object: 'moon'
+});
 result.points.forEach(point => {
   console.log(`Center: (${point.x}, ${point.y})`);
 });
@@ -306,17 +315,20 @@ result.points.forEach(point => {
 **Image Captioning** - Generate natural language descriptions of images.
 
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with your API key
-const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
 
 // Load an image
-const imageBuffer = fs.readFileSync('path/to/image.jpg');
+const image = fs.readFileSync('path/to/image.jpg');
 
 // Generate a caption
-const result = await model.caption(imageBuffer, { length: 'normal' });
+const result = await model.caption({
+  image: image,
+  length: 'normal'
+});
 console.log(result.caption);
 ```
 

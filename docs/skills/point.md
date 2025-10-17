@@ -58,26 +58,29 @@ plt.show()
 ```
 
   </TabItem>
-  <TabItem value="js" label="JavaScript">
+  <TabItem value="js" label="Node.js">
   
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with API key
-const model = moondream.vl({ apiKey: "your-api-key" });
+const model = new vl({ apiKey: "your-api-key" });
 
 // Load an image
-const imageBuffer = fs.readFileSync("path/to/image.jpg");
+const image = fs.readFileSync("path/to/image.jpg");
 
 // Locate objects
-const result = await model.point(imageBuffer, "face");
+const result = await model.point({
+  image: image,
+  object: "face"
+});
 console.log(`Found ${result.points.length} faces`);
 console.log(`Request ID: ${result.request_id}`);
 
 // Process the points
 result.points.forEach((point, index) => {
-    console.log(`Face ${index + 1}: x=${point.x}, y=${point.y}`);
+  console.log(`Face ${index + 1}: x=${point.x}, y=${point.y}`);
 });
 ```
 

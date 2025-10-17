@@ -41,27 +41,34 @@ for chunk in stream_result["chunk"]:
 ```
 
   </TabItem>
-  <TabItem value="js" label="JavaScript">
+  <TabItem value="js" label="Node.js">
   
 ```javascript
-const moondream = require('moondream');
-const fs = require('fs');
+import { vl } from 'moondream';
+import fs from 'fs';
 
 // Initialize with API key
-const model = moondream.vl({ apiKey: "your-api-key" });
+const model = new vl({ apiKey: "your-api-key" });
 
 // Load an image
-const imageBuffer = fs.readFileSync("path/to/image.jpg");
+const image = fs.readFileSync("path/to/image.jpg");
 
 // Ask a question
-const result = await model.query(imageBuffer, "What's in this image?");
+const result = await model.query({
+  image: image,
+  question: "What's in this image?"
+});
 console.log(`Answer: ${result.answer}`);
 console.log(`Request ID: ${result.request_id}`);
 
 // Stream the response
-const streamResult = await model.query(imageBuffer, "What's in this image?", { stream: true });
-for await (const chunk of streamResult.chunk) {
-    process.stdout.write(chunk);
+const stream = await model.query({
+  image: image,
+  question: "What's in this image?",
+  stream: true
+});
+for await (const chunk of stream.answer) {
+  process.stdout.write(chunk);
 }
 ```
 
