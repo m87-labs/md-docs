@@ -128,15 +128,13 @@ curl -X POST https://api.moondream.ai/v1/caption \
 <Tabs>
   <TabItem value="python" label="Python" default>
 
-### Installation
+**Installation:**
 
 ```bash
 pip install moondream
 ```
 
 [View Python SDK Documentation →](https://pypi.org/project/moondream/)
-
-### Code Examples
 
 <Tabs groupId="api-method">
   <TabItem value="query" label="Query" default>
@@ -226,15 +224,13 @@ print(result["caption"])
   </TabItem>
   <TabItem value="nodejs" label="Node.js">
 
-### Installation
+**Installation:**
 
 ```bash
 npm install moondream
 ```
 
 [View Node.js SDK Documentation →](https://www.npmjs.com/package/moondream)
-
-### Code Examples
 
 <Tabs groupId="api-method">
   <TabItem value="query" label="Query" default>

@@ -8,7 +8,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import StreamingDemo from '@site/src/components/StreamingDemo';
 
-```bash {}
+```bash {7}
 curl -N -X POST https://api.moondream.ai/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
@@ -30,7 +30,7 @@ Streaming lets you receive AI responses as they're being generated, word-by-word
 
 ### Query
 
-```python
+```python {11}
 import moondream as md
 from PIL import Image
 
@@ -47,7 +47,7 @@ for chunk in model.query(image, question="What is in this image?", stream=True)[
 
 ### Caption
 
-```python
+```python {11}
 import moondream as md
 from PIL import Image
 
@@ -69,7 +69,7 @@ for chunk in model.caption(image, stream=True)["caption"]:
 
 ### Query
 
-```javascript
+```javascript {14}
 import { vl } from 'moondream';
 import fs from 'fs';
 
@@ -92,7 +92,7 @@ for await (const chunk of stream.answer) {
 
 ### Caption
 
-```javascript
+```javascript {14}
 import { vl } from 'moondream';
 import fs from 'fs';
 

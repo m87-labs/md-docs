@@ -1,0 +1,130 @@
+.container {
+    margin: 1.5rem 0;
+}
+
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.tableHeader {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background: var(--ifm-color-emphasis-100);
+    border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.headerCell {
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ifm-color-emphasis-700);
+}
+
+.tableBody {
+    background: var(--ifm-background-surface-color);
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    transition: background-color 0.2s ease;
+}
+
+.row:hover {
+    background: var(--ifm-color-emphasis-50);
+}
+
+.cell {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.cell:last-child {
+    border-right: none;
+}
+
+.modelName {
+    font-family: var(--ifm-font-family-monospace);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ifm-color-primary);
+}
+
+.rateValue {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ifm-font-color-base);
+    line-height: 1;
+    display: inline;
+}
+
+.rateUnit {
+    font-size: 0.75rem;
+    color: var(--ifm-color-emphasis-600);
+    font-weight: 500;
+    display: inline;
+    margin-left: 0.25rem;
+}
+
+.tierNote {
+    font-size: 0.7rem;
+    color: var(--ifm-color-emphasis-600);
+    line-height: 1.3;
+    margin-top: 0.35rem;
+}
+
+/* Dark mode adjustments */
+[data-theme='dark'] .table {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: var(--ifm-color-emphasis-300);
+}
+
+[data-theme='dark'] .row:hover {
+    background: var(--ifm-color-emphasis-100);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+
+    .tableHeader,
+    .row {
+        grid-template-columns: 1fr;
+    }
+
+    .headerCell:first-child,
+    .cell:first-child {
+        border-bottom: 1px solid var(--ifm-color-emphasis-200);
+    }
+
+    .headerCell:not(:first-child) {
+        display: none;
+    }
+
+    .cell {
+        padding: 1rem 1.5rem;
+    }
+
+    .cell::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ifm-color-emphasis-700);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .cell:first-child::before {
+        content: '';
+        display: none;
+    }
+}

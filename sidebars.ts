@@ -19,6 +19,7 @@ const sidebars: SidebarsConfig = {
     'pricing',
     'quickstart',
     'api',
+    'rate-limits',
     'reasoning',
     'streaming',
     {
