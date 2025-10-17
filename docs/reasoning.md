@@ -35,7 +35,7 @@ import TabItem from '@theme/TabItem';
 
 [View Python SDK Documentation →](https://pypi.org/project/moondream/)
 
-```python
+```python {11}
 import moondream as md
 from PIL import Image
 
@@ -55,7 +55,7 @@ print(result["answer"])
 
 [View Node.js SDK Documentation →](https://www.npmjs.com/package/moondream)
 
-```javascript
+```javascript {14}
 import { vl } from 'moondream';
 import fs from 'fs';
 
