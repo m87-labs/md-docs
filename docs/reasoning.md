@@ -34,34 +34,36 @@ import TabItem from '@theme/TabItem';
   <TabItem value="python" label="Python" default>
 
 ```python
-from moondream import Moondream
+import moondream as md
+from PIL import Image
 
-client = Moondream(api_key="YOUR_API_KEY")
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
 
 # Query with reasoning enabled
-response = client.query(
-    image_url="data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...",
-    question="What is in this image?",
-    reasoning=True
-)
-print(response.answer)
+result = model.query(image, "What is in this image?", reasoning=True)
+print(result["answer"])
 ```
 
   </TabItem>
   <TabItem value="nodejs" label="Node.js">
 
 ```javascript
-import { Moondream } from 'moondream';
+const moondream = require('moondream');
+const fs = require('fs');
 
-const client = new Moondream({ apiKey: 'YOUR_API_KEY' });
+// Initialize with your API key
+const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const imageBuffer = fs.readFileSync('path/to/image.jpg');
 
 // Query with reasoning enabled
-const response = await client.query({
-  imageUrl: 'data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+...',
-  question: 'What is in this image?',
-  reasoning: true
-});
-console.log(response.answer);
+const result = await model.query(imageBuffer, 'What is in this image?', { reasoning: true });
+console.log(result.answer);
 ```
 
   </TabItem>

@@ -28,30 +28,38 @@ Streaming lets you receive AI responses as they're being generated, word-by-word
 
 The Python SDK handles streaming automatically:
 
-```python {9}
-from moondream import Moondream
+```python
+import moondream as md
+from PIL import Image
 
-client = Moondream(api_key="YOUR_API_KEY")
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
 
 # Stream a query response
-for chunk in client.query(
-    image_url="data:image/jpeg;base64,...",
-    question="What is in this image?",
-    stream=True
-):
-    print(chunk.text, end="", flush=True)
+stream_result = model.query(image, "What is in this image?", stream=True)
+for chunk in stream_result["chunk"]:
+    print(chunk, end="", flush=True)
 ```
 
 For captions:
 
-```python {5}
+```python
+import moondream as md
+from PIL import Image
+
+# Initialize with your API key
+model = md.vl(api_key="YOUR_API_KEY")
+
+# Load an image
+image = Image.open("path/to/image.jpg")
+
 # Stream a caption
-for chunk in client.caption(
-    image_url="data:image/jpeg;base64,...",
-    length="normal",
-    stream=True
-):
-    print(chunk.text, end="", flush=True)
+stream_result = model.caption(image, stream=True)
+for chunk in stream_result["chunk"]:
+    print(chunk, end="", flush=True)
 ```
 
   </TabItem>
@@ -59,35 +67,39 @@ for chunk in client.caption(
 
 The Node.js SDK handles streaming automatically:
 
-```javascript {9}
-import { Moondream } from 'moondream';
+```javascript
+const moondream = require('moondream');
+const fs = require('fs');
 
-const client = new Moondream({ apiKey: 'YOUR_API_KEY' });
+// Initialize with your API key
+const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const imageBuffer = fs.readFileSync('path/to/image.jpg');
 
 // Stream a query response
-const stream = await client.query({
-  imageUrl: 'data:image/jpeg;base64,...',
-  question: 'What is in this image?',
-  stream: true
-});
-
-for await (const chunk of stream) {
-  process.stdout.write(chunk.text);
+const streamResult = await model.query(imageBuffer, 'What is in this image?', { stream: true });
+for await (const chunk of streamResult.chunk) {
+    process.stdout.write(chunk);
 }
 ```
 
 For captions:
 
-```javascript {5}
-// Stream a caption
-const stream = await client.caption({
-  imageUrl: 'data:image/jpeg;base64,...',
-  length: 'normal',
-  stream: true
-});
+```javascript
+const moondream = require('moondream');
+const fs = require('fs');
 
-for await (const chunk of stream) {
-  process.stdout.write(chunk.text);
+// Initialize with your API key
+const model = moondream.vl({ apiKey: 'YOUR_API_KEY' });
+
+// Load an image
+const imageBuffer = fs.readFileSync('path/to/image.jpg');
+
+// Stream a caption
+const streamResult = await model.caption(imageBuffer, { stream: true });
+for await (const chunk of streamResult.chunk) {
+    process.stdout.write(chunk);
 }
 ```
 
