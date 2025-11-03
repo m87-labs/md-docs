@@ -16,6 +16,7 @@ const sidebars: SidebarsConfig = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
   tutorialSidebar: [
     'overview',
+    'running-locally',
     'pricing',
     'quickstart',
     'api',
@@ -39,6 +40,7 @@ const sidebars: SidebarsConfig = {
     },
     'faq',
     'station',
+    'huggingface-transformers',
   ],
 };
 
