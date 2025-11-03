@@ -62,8 +62,8 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
 
 ## Next steps
 
-- Visit the [Moondream Station guide](/docs/station) for the fastest way to start.
-- Explore the [HuggingFace Transformers setup](/docs/huggingface-transformers) for full control.
+- Visit the [Moondream Station guide](/station) for the fastest way to start.
+- Explore the [HuggingFace Transformers setup](/huggingface-transformers) for full control.
 
 ## Need Help?
 
