@@ -17,7 +17,7 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
   <div className="col col--6">
     <div className="card" style={{height: '100%'}}>
       <div className="card__header">
-        <span className="badge badge--success">RECOMMENDED</span>
+        <span className="badge badge--success badge-spaced">RECOMMENDED</span>
         <h3>🚀 Moondream Station</h3>
       </div>
       <div className="card__body">
@@ -39,7 +39,7 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
   <div className="col col--6">
     <div className="card" style={{height: '100%'}}>
       <div className="card__header">
-        <span className="badge badge--warning">ADVANCED</span>
+        <span className="badge badge--warning badge-spaced">ADVANCED</span>
         <h3>🔧 HuggingFace Transformers</h3>
       </div>
       <div className="card__body">
