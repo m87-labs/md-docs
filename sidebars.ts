@@ -36,7 +36,6 @@ const sidebars: SidebarsConfig = {
     },
     'faq',
     'station',
-    'huggingface-transformers',
   ],
 };
 
