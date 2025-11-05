@@ -52,7 +52,7 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
         </ul>
       </div>
       <div className="card__footer">
-        <a href="/huggingface-transformers" className="button button--primary button--block">Get Started →</a>
+        <a href="/transformers" className="button button--primary button--block">Get Started →</a>
       </div>
     </div>
   </div>
@@ -63,7 +63,7 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
 ## Next steps
 
 - Visit the [Moondream Station guide](/station) for the fastest way to start.
-- Explore the [HuggingFace Transformers setup](/huggingface-transformers) for full control.
+- Explore the [HuggingFace Transformers setup](/transformers) for full control.
 
 ## Need Help?
 
