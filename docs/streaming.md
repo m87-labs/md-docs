@@ -19,7 +19,7 @@ curl -N -X POST https://api.moondream.ai/v1/query \
   }'
 ```
 <StreamingDemo />
-Streaming lets you receive AI responses as they're being generated, word-by-word, instead of waiting for the complete answer. This creates a more responsive experience for your users.  Streaming is available for the `query` and `caption` endpoints.
+Streaming lets you receive AI responses as they're being generated, word-by-word, instead of waiting for the complete answer. This creates a more responsive experience for your users. Streaming is available for the [query](./skills/query), [caption](./skills/caption), and [segment](./skills/segment) skills.
 
 ## Using with the SDK
 
@@ -110,6 +110,62 @@ const stream = await model.caption({
 });
 for await (const chunk of stream.caption) {
   process.stdout.write(chunk);
+}
+```
+
+  </TabItem>
+</Tabs>
+
+### Segment
+
+Segment streaming returns the bounding box immediately, followed by coarse path chunks, and finally the refined path:
+
+<Tabs>
+  <TabItem value="python" label="Python" default>
+
+```python
+import moondream as md
+from PIL import Image
+
+model = md.vl(api_key="YOUR_API_KEY")
+image = Image.open("path/to/image.jpg")
+
+# Stream segmentation updates
+for update in model.segment(image, "cat", stream=True):
+    if "bbox" in update and not update.get("completed"):
+        print(f"Bbox: {update['bbox']}")  # Available immediately
+    if "chunk" in update:
+        print(update["chunk"], end="")  # Coarse path chunks
+    if update.get("completed"):
+        print(f"\nFinal path: {update['path']}")
+```
+
+  </TabItem>
+  <TabItem value="nodejs" label="Node.js">
+
+```javascript
+import { vl } from 'moondream';
+import fs from 'fs';
+
+const model = new vl({ apiKey: 'YOUR_API_KEY' });
+const image = fs.readFileSync('path/to/image.jpg');
+
+const stream = await model.segment({
+  image: image,
+  object: 'cat',
+  stream: true
+});
+
+for await (const update of stream) {
+  if (update.bbox && !update.completed) {
+    console.log('Bbox:', update.bbox);
+  }
+  if (update.chunk) {
+    process.stdout.write(update.chunk);
+  }
+  if (update.completed) {
+    console.log('\nFinal path:', update.path);
+  }
 }
 ```
 

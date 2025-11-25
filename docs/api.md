@@ -9,7 +9,7 @@ title: API
 ```
 https://api.moondream.ai/v1/
 ```
-All API requests use this base URL with skill-specific endpoints (`/query`, `/detect`, `/point`, `/caption`).
+All API requests use this base URL with skill-specific endpoints (`/query`, `/detect`, `/point`, `/caption`, `/segment`).
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -123,6 +123,34 @@ curl -X POST https://api.moondream.ai/v1/caption \
     "ttft_ms": 81.97528193704784
   },
   "finish_reason": "stop"
+}
+```
+
+  </TabItem>
+  <TabItem value="segment" label="Segment">
+
+**Image Segmentation** - Generate SVG path masks for objects.
+
+```bash
+curl -X POST https://api.moondream.ai/v1/segment \
+  -H 'Content-Type: application/json' \
+  -H 'X-Moondream-Auth: YOUR_API_KEY' \
+  -d '{
+    "image_url": "data:image/jpeg;base64,...",
+    "object": "cat"
+  }'
+```
+
+**Response:**
+```json
+{
+  "path": "M 0 0.76 L 0 0.32 L 0.03 0.31 C 0.04 0.30 0.09 0.28 0.12 0.27...",
+  "bbox": {
+    "x_min": 0.0002,
+    "y_min": 0.0039,
+    "x_max": 0.7838,
+    "y_max": 0.9971
+  }
 }
 ```
 

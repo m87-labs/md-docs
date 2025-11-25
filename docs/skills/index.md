@@ -43,3 +43,12 @@ Detect and identify objects, people, and elements in images. Ideal for:
 - Scene understanding
 - Content moderation
 
+### ✂️ [Segment](./segment)
+
+Generate precise SVG path segmentation masks for objects. Perfect for:
+
+- Image cutouts and masks
+- Precise object selection
+- Background removal
+- Interactive editing
+
