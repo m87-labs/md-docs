@@ -178,13 +178,47 @@ When streaming, you'll receive Server-Sent Events with different message types:
 
 ## Using the SVG Path
 
-The path coordinates are normalized to [0, 1]. Use a viewBox of `0 0 1 1` and set `preserveAspectRatio="none"` to match your image:
+The path coordinates are normalized to [0, 1] **relative to the bounding box**, not the full image. To render the mask correctly, you need to position and scale the path within the bounding box region:
 
 ```html
-<svg viewBox="0 0 1 1" preserveAspectRatio="none" style="width: 800px; height: 600px;">
-  <image href="your-image.jpg" width="1" height="1" preserveAspectRatio="none"/>
-  <path d="M 0 0.76 L 0 0.32..." fill="rgba(255,0,0,0.3)" stroke="red" stroke-width="0.002"/>
-</svg>
+<div style="position: relative; width: 800px; height: 600px;">
+  <img src="your-image.jpg" style="width: 100%; height: 100%;" />
+  <!-- Position SVG within the bounding box region -->
+  <svg
+    viewBox="0 0 1 1"
+    preserveAspectRatio="none"
+    style="
+      position: absolute;
+      left: calc(x_min * 100%);
+      top: calc(y_min * 100%);
+      width: calc((x_max - x_min) * 100%);
+      height: calc((y_max - y_min) * 100%);
+    "
+  >
+    <path d="M 0 0.76 L 0 0.32..." fill="rgba(255,0,0,0.3)" stroke="red" stroke-width="0.01"/>
+  </svg>
+</div>
+```
+
+In practice, replace the `calc()` expressions with actual values from the bbox:
+
+```javascript
+const { bbox, path } = result;
+const container = document.querySelector('.image-container');
+const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+svg.setAttribute('viewBox', '0 0 1 1');
+svg.setAttribute('preserveAspectRatio', 'none');
+svg.style.position = 'absolute';
+svg.style.left = `${bbox.x_min * 100}%`;
+svg.style.top = `${bbox.y_min * 100}%`;
+svg.style.width = `${(bbox.x_max - bbox.x_min) * 100}%`;
+svg.style.height = `${(bbox.y_max - bbox.y_min) * 100}%`;
+
+const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+pathEl.setAttribute('d', path);
+pathEl.setAttribute('fill', 'rgba(255,0,0,0.3)');
+svg.appendChild(pathEl);
+container.appendChild(svg);
 ```
 
 ## Segment vs. Detect
