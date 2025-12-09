@@ -80,29 +80,37 @@ const config: Config = {
     },
     image: 'img/docusaurus-social-card.jpg',
     navbar: {
-      title: 'Moondream Docs',
+      title: 'Moondream',
       logo: {
         alt: 'Moondream Logo',
         src: 'img/md_logo.svg',
+        href: 'https://moondream.ai',
         width: 32,
         height: 32,
       },
-      /*
       items: [
+        {
+          href: 'https://moondream.ai/c/playground',
+          label: 'Playground',
+          position: 'left',
+        },
         {
           type: 'docSidebar',
           sidebarId: 'tutorialSidebar',
           position: 'left',
-          label: 'Tutorial',
+          label: 'Docs',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
-          position: 'right',
+          href: 'https://moondream.ai/blog',
+          label: 'Blog',
+          position: 'left',
+        },
+        {
+          href: 'https://moondream.ai/pricing',
+          label: 'Pricing',
+          position: 'left',
         },
       ],
-      */
     },
     /*
     footer: {
