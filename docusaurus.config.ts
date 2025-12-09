@@ -9,6 +9,9 @@ const config: Config = {
   tagline: 'Documentation for Moondream',
   favicon: 'img/md_logo.svg',
 
+  // Sync theme from URL parameter when coming from main site
+  clientModules: [require.resolve('./src/theme-sync.ts')],
+
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true, // Improve compatibility with the upcoming Docusaurus v4
@@ -85,6 +88,7 @@ const config: Config = {
         alt: 'Moondream Logo',
         src: 'img/md_logo.svg',
         href: 'https://moondream.ai',
+        target: '_self',
         width: 32,
         height: 32,
       },
@@ -93,6 +97,7 @@ const config: Config = {
           href: 'https://moondream.ai/c/playground',
           label: 'Playground',
           position: 'left',
+          target: '_self',
         },
         {
           type: 'docSidebar',
@@ -104,11 +109,13 @@ const config: Config = {
           href: 'https://moondream.ai/blog',
           label: 'Blog',
           position: 'left',
+          target: '_self',
         },
         {
           href: 'https://moondream.ai/pricing',
           label: 'Pricing',
           position: 'left',
+          target: '_self',
         },
       ],
     },
