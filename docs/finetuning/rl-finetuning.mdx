@@ -1,0 +1,112 @@
+---
+title: "RL finetuning"
+slug: /finetuning
+sidebar_position: 1
+---
+
+# RL finetuning
+
+Finetuning lets you customize Moondream for your specific use case. Instead of using the general-purpose model, you can train it to be better at exactly what you need.
+
+**RL (Reinforcement Learning) finetuning** works by letting the model try things, then telling it which attempts were good and which weren't. Over time, it learns to produce more of what you want.
+
+## When to use RL finetuning
+
+RL finetuning shines when:
+
+- **You can recognize good output easier than you can write it.** For example, you know a good product description when you see one, but writing perfect examples for every case is impractical.
+
+- **Multiple answers are acceptable.** If "the red car" and "a red vehicle on the left" are both correct answers to "what's in the image?", RL lets you reward both rather than penalizing one for not matching a single target. This also applies to spatial outputs like bounding boxes and points, where order doesn't matter—detecting objects A, B, C is just as correct as C, B, A.
+
+- **You want to encode preferences.** Maybe you want the model to be more conservative, more detailed, or to prioritize certain types of objects. RL lets you score outputs according to your criteria.
+
+- **You have limited training data.** RL is more sample-efficient than supervised finetuning—it extracts more learning signal from each example by generating and scoring multiple attempts.
+
+### Examples
+
+| Task | Why RL works well |
+|------|-------------------|
+| Answering questions about medical images | Multiple valid phrasings; you can have a domain expert score accuracy |
+| Pointing to defects on a manufacturing line | "Correct" depends on context—ignore minor scratches, focus on cracks |
+| Detecting people in security footage | You want to tune the precision/recall tradeoff for your specific needs |
+| Generating product descriptions | Many good descriptions exist; easier to rate than to write perfect examples |
+
+### Important: the model needs a starting point
+
+RL finetuning works best when the model can already *somewhat* perform the task. It boosts accuracy in your specific domain by reinforcing good behaviors the model already exhibits.
+
+If the model currently can't do the task at all, RL won't have good behaviors to reinforce. In that case, start with a small amount of supervised finetuning to teach the basics, then switch to RL to refine performance. You can also provide ground-truth examples alongside your reward function during RL training to help bootstrap the model.
+
+## How it works (simplified)
+
+1. **You provide training data** — images and prompts representing the tasks you want to improve
+2. **The model generates multiple attempts** — for each input, it produces several candidate outputs
+3. **You score the attempts** — your reward function rates each output (higher = better)
+4. **The model learns from scores** — it adjusts to produce more high-scoring outputs
+
+This cycle repeats. Periodically, you evaluate progress by testing the model on held-out examples.
+
+## Supported skills
+
+You can finetune these Moondream capabilities:
+
+| Skill | What it does | Output | Example use |
+|-------|--------------|--------|-------------|
+| **query** | Answer questions about images | Text | "What brand is this product?" |
+| **point** | Locate objects in an image | x, y coordinates | "Point to the defects" |
+| **detect** | Locate objects in an image | Bounding boxes | "Detect all vehicles" |
+
+## RL vs supervised finetuning
+
+If you're familiar with traditional (supervised) finetuning, here's how RL differs:
+
+| Aspect | Supervised finetuning | RL finetuning |
+|--------|----------------------|---------------|
+| What you provide | Correct answer for each example | Scoring function |
+| Best when | You have perfect labels | Labels are fuzzy, expensive, or ambiguous |
+| Multiple valid outputs | Poorly supported | Handles naturally |
+| Sample efficiency | Lower | Higher |
+
+**Start with RL finetuning** in most cases—it's more sample-efficient, handles ambiguity naturally, and lets you encode exactly what "good" means for your use case.
+
+**Consider supervised finetuning** if you have large amounts of high-quality, unambiguous labels and the task has a single correct answer per input. It's also useful for bootstrapping—if Moondream can't perform your task well enough for RL to work, a small amount of supervised finetuning can teach the basics before you switch to RL for refinement.
+
+You can also combine both approaches—provide ground truth labels for some samples and use custom scoring for others.
+
+## What you need
+
+To run RL finetuning, you'll need:
+
+1. **Training data** — images and prompts for the skill you're finetuning
+2. **A reward function** — code that takes a model output and returns a score
+3. **An evaluation function** — code that checks if an output is "correct" (for tracking progress)
+
+For point and detect skills, you can optionally provide ground truth coordinates, and the system will compute rewards automatically.
+
+## Key concepts
+
+These terms appear throughout the finetuning documentation:
+
+| Term | Meaning |
+|------|---------|
+| **Rollout** | One output attempt from the model |
+| **Reward** | A score you assign to a rollout (higher = better) |
+| **Adapter** | The finetuned weights that layer on top of the base model (using LoRA) |
+| **Checkpoint** | A saved adapter so you can resume training or roll back |
+| **Train step** | One update to the model based on a batch of scored rollouts |
+
+## Architecture overview
+
+The finetuning system splits work between your code and Moondream Cloud:
+
+| Your code | Moondream Cloud |
+|-----------|-----------------|
+| Provides training data<br/>Scores model outputs<br/>Orchestrates training | Generates model outputs<br/>Applies training updates<br/>Manages checkpoints |
+
+Your orchestration code runs anywhere—no GPU required.
+
+## Next steps
+
+- **Using the interface** — Learn the API for generating rollouts and training
+- **End-to-end tutorial** — Walk through a complete finetuning workflow
+- **HTTP API reference** — Detailed schema documentation
