@@ -1,0 +1,304 @@
+---
+sidebar_position: 2
+title: "Using the interface"
+---
+
+# Using the interface
+
+This page covers the core API operations for RL finetuning. You send requests and score outputs; Moondream Cloud handles the model updates.
+
+All endpoints use the base URL `https://api.moondream.ai/v1/tuning/`.
+
+At a high level, there are **three operations**:
+
+1. **Create an adapter** — set up a new adapter to train.
+2. **Generate rollouts** — ask the model for multiple attempts.
+3. **Apply a train step** — send those attempts back with rewards so the model can learn.
+
+Everything else (sampling data, rewards, evaluation, stopping criteria) stays in your control.
+
+## Create an adapter
+
+Before training, create an adapter to hold your finetuned weights:
+
+`POST /adapters`
+
+You provide:
+
+- **`name`** — a human-readable name for this adapter.
+- **`rank`** — the LoRA rank (higher = more capacity, but slower and more memory).
+
+The response includes an **`adapter_id`** that you'll use for all subsequent calls.
+
+## Generate rollouts
+
+To start a training iteration, you call:
+
+`POST /rollouts`
+
+You provide:
+
+- **`adapter_id`** — the adapter to use (from the create adapter call).
+- **A skill request** — one of `query`, `point`, or `detect`.
+- **`num_rollouts`** — how many attempts to generate for this request (currently 1–16).
+- **`ground_truth`** (optional) — for `point` and `detect`, you may include ground truth so rewards can be
+  computed automatically.
+
+The response includes:
+
+- the **echoed request**
+- a list of **rollouts** (one per attempt)
+- **rewards** if you provided ground truth; otherwise `null`
+
+Important: rollouts may include extra metadata needed for training. Treat each rollout object as opaque
+training data and pass it back unchanged during the train step.
+
+## Apply a train step
+
+Once you have rollouts, you compute rewards on your side and call:
+
+`POST /train_step`
+
+You send a list of **groups**. Each group contains:
+
+- the original rollout request
+- the rollouts you received
+- a reward per rollout, in the same order
+
+You can mix skills across groups within the same train step.
+
+The response returns training metrics (loss, average reward, etc.) that you can use to monitor learning and detect instability.
+
+## Ground truth and rewards
+
+You can either provide ground truth and let the server compute rewards, or compute rewards yourself.
+
+**Detect** — ground truth is an array of bounding boxes (normalized 0–1):
+
+```json
+{
+  "skill": "detect",
+  "objects": [
+    { "x_min": 0.10, "y_min": 0.20, "x_max": 0.40, "y_max": 0.60 }
+  ]
+}
+```
+
+**Point** — ground truth can be coordinates or bounding boxes (normalized 0–1):
+
+```json
+{
+  "skill": "point",
+  "points": [{ "x": 0.52, "y": 0.31 }]
+}
+```
+
+Or with bounding boxes (rewards based on whether the predicted point falls inside):
+
+```json
+{
+  "skill": "point",
+  "boxes": [{ "x_min": 0.10, "y_min": 0.20, "x_max": 0.40, "y_max": 0.60 }]
+}
+```
+
+**Query** — no ground truth support. You must score text outputs yourself using your own reward function.
+
+Use ground truth when you have labeled data and the default reward calculation fits your needs. Use custom rewards when you want to encode specific preferences (e.g., penalizing false positives more than false negatives) or when scoring text outputs.
+
+## Settings
+
+All skill requests accept a `settings` object:
+
+```json
+"settings": {
+  "temperature": 1.0,
+  "top_p": 1.0,
+  "max_tokens": 128
+}
+```
+
+- **temperature** — controls randomness. Use higher values (e.g., 1.0) during training for diverse rollouts, zero for deterministic evaluation.
+- **top_p** — nucleus sampling threshold. Usually leave at 1.0.
+- **max_tokens** — maximum output length.
+
+For detect, you can also set **max_objects** to limit the number of detected objects.
+
+## Image requirements
+
+Images must be base64 data URLs:
+
+```
+data:image/jpeg;base64,/9j/4AAQ...
+data:image/png;base64,iVBORw0K...
+data:image/webp;base64,UklGR...
+```
+
+HTTP/HTTPS URLs are not supported. Images larger than ~8MB (decoded) or with very large dimensions will be rejected.
+
+## Checkpoints
+
+Save your adapter's state at any point during training:
+
+```json
+// POST /adapters/{adapter_id}/checkpoint
+{}
+```
+
+Response:
+
+```json
+{
+  "checkpoint_id": "abc123/chk_001",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+To continue from a checkpoint, create a new adapter with `from_checkpoint`:
+
+```json
+// POST /adapters
+{
+  "name": "my-adapter-v2",
+  "rank": 32,
+  "from_checkpoint": "abc123/chk_001"
+}
+```
+
+This lets you roll back if a training run goes off track, or branch from a known-good state to try different reward functions.
+
+## Example: detect skill
+
+Here's a complete request/response cycle for the `detect` skill. Other skills follow the same pattern—see the HTTP API reference for full schemas.
+
+### 1. Create an adapter
+
+```json
+// POST /adapters
+{
+  "name": "vehicle-detector",
+  "rank": 32
+}
+```
+
+Response:
+
+```json
+{
+  "adapter_id": "abc123"
+}
+```
+
+### 2. Generate rollouts
+
+```json
+// POST /rollouts
+{
+  "adapter_id": "abc123",
+  "num_rollouts": 4,
+  "request": {
+    "skill": "detect",
+    "object": "vehicles",
+    "image_url": "data:image/jpeg;base64,/9j/4AAQ..."
+  },
+  "ground_truth": {
+    "skill": "detect",
+    "objects": [
+      { "x_min": 0.10, "y_min": 0.20, "x_max": 0.40, "y_max": 0.60 },
+      { "x_min": 0.55, "y_min": 0.30, "x_max": 0.85, "y_max": 0.70 }
+    ]
+  }
+}
+```
+
+Response:
+
+```json
+{
+  "request": { "...echoed request..." },
+  "rollouts": [
+    {
+      "skill": "detect",
+      "output": {
+        "objects": [
+          { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
+        ]
+      },
+      "answer_tokens": [...],
+      "coords": [...]
+    },
+    // ... 3 more rollouts
+  ],
+  "rewards": [0.8, 0.3, 0.6, 0.5]
+}
+```
+
+The `output` field contains the model's prediction. Fields like `answer_tokens` and `coords` are opaque training metadata—pass them back unchanged.
+
+If you provided `ground_truth`, rewards are computed automatically. Otherwise, `rewards` is `null` and you compute them yourself.
+
+### 3. Apply a train step
+
+```json
+// POST /train_step
+{
+  "adapter_id": "abc123",
+  "groups": [
+    {
+      "request": { "...echoed request from rollouts response..." },
+      "rollouts": [ "...rollout objects from rollouts response..." ],
+      "rewards": [0.8, 0.3, 0.6, 0.5]
+    }
+  ]
+}
+```
+
+Response:
+
+```json
+{
+  "loss": 0.123,
+  "reward_mean": 0.55,
+  "num_groups": 1
+}
+```
+
+You can batch multiple groups (from different images/requests) into a single train step.
+
+### Evaluation
+
+For evaluation, request a single rollout with temperature set to zero for deterministic output:
+
+```json
+// POST /rollouts
+{
+  "adapter_id": "abc123",
+  "num_rollouts": 1,
+  "request": {
+    "skill": "detect",
+    "object": "vehicles",
+    "image_url": "data:image/jpeg;base64,/9j/4AAQ...",
+    "settings": {
+      "temperature": 0
+    }
+  }
+}
+```
+
+During training, higher temperature (e.g., 1.0) encourages diverse rollouts. For evaluation, zero temperature gives the model's best guess so you can measure true accuracy.
+
+Do **not** send evaluation rollouts to `/train_step`.
+
+## Interface contracts and gotchas
+
+Keep these rules in mind:
+
+- **Rewards must align with rollouts**. The `rewards` array must match the length and order of the
+  `rollouts` list you're sending.
+- **Round‑trip rollout objects**. Don't edit, drop, or re‑serialize rollout metadata fields; pass them back as
+  you received them.
+- **Use fresh rollouts**. Be cautious about reusing old rollouts after training updates—they were generated by a different version of the model.
+
+## Next steps
+
+- See the **HTTP API reference** for full schemas of all skills (`query`, `point`, `detect`).

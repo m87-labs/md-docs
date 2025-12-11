@@ -223,3 +223,8 @@
   align-items: center;
   margin-bottom: 0.75rem;
 }
+
+/* Inline code styling */
+code {
+  padding: 0.1rem 0.35rem;
+}
