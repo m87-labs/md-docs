@@ -81,7 +81,7 @@ To run RL finetuning, you'll need:
 2. **A reward function** — code that takes a model output and returns a score
 3. **An evaluation function** — code that checks if an output is "correct" (for tracking progress)
 
-For point and detect skills, you can optionally provide ground truth coordinates, and the system will compute rewards automatically.
+For point and detect skills, you can optionally provide ground truth, and the system will compute rewards automatically.
 
 ## Key concepts
 
@@ -105,7 +105,21 @@ The finetuning system splits work between your code and Moondream Cloud:
 
 Your orchestration code runs anywhere—no GPU required.
 
+## Using your finetuned model
+
+Once you've trained an adapter and saved a checkpoint, use it for inference by passing the checkpoint ID to the `adapter` parameter in the standard Moondream API endpoints (`/query`, `/point`, `/detect`):
+
+```json
+{
+  "image_url": "data:image/jpeg;base64,...",
+  "object": "vehicles",
+  "adapter": "abc123/chk_001"
+}
+```
+
+See the main [API documentation](/api) for details on the inference endpoints.
+
 ## Next steps
 
 - **[Using the interface](/finetuning/using-the-interface)** — Learn the API for generating rollouts and training
-- **HTTP API reference** — Detailed schema documentation
+- **[HTTP API reference](/finetuning/http-api-reference)** — Detailed schema documentation

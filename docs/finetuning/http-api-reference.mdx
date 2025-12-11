@@ -1,0 +1,393 @@
+---
+sidebar_position: 3
+title: "HTTP API reference"
+---
+
+# HTTP API reference
+
+Base URL: `https://api.moondream.ai/v1/tuning/`
+
+## Authentication
+
+All requests require the `X-Moondream-Auth` header with your API key:
+
+```
+X-Moondream-Auth: YOUR_API_KEY
+```
+
+Get your API key from the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys).
+
+---
+
+## POST /adapters
+
+Create a new adapter for finetuning.
+
+### Request
+
+```json
+{
+  "name": "my-adapter",
+  "rank": 32,
+  "from_checkpoint": "abc123/chk_001"  // optional
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| name | string | yes | Human-readable name for this adapter |
+| rank | integer | yes | LoRA rank: 16 or 32 (higher = more capacity, but slower) |
+| from_checkpoint | string | no | Checkpoint ID to initialize from (format: `adapter_id/checkpoint_id`) |
+
+### Response
+
+```json
+{
+  "adapter_id": "abc123"
+}
+```
+
+---
+
+## POST /adapters/:adapter_id/checkpoint
+
+Save the current adapter state.
+
+### Request
+
+No body required.
+
+### Response
+
+```json
+{
+  "checkpoint_id": "abc123/chk_001",
+  "created_at": "2025-01-15T10:30:00Z"
+}
+```
+
+---
+
+## GET /adapters
+
+List all your adapters.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| limit | integer | 20 | Maximum number of results |
+| cursor | string | — | Pagination cursor from previous response |
+
+### Response
+
+```json
+{
+  "adapters": [
+    {
+      "adapter_id": "abc123",
+      "name": "vehicle-detector",
+      "rank": 32,
+      "created_at": "2025-01-15T10:00:00Z"
+    }
+  ],
+  "next_cursor": "eyJpZCI6ImFiYzEyMyJ9"
+}
+```
+
+---
+
+## GET /adapters/:adapter_id
+
+Get details for a specific adapter.
+
+### Response
+
+```json
+{
+  "adapter_id": "abc123",
+  "name": "vehicle-detector",
+  "rank": 32,
+  "created_at": "2025-01-15T10:00:00Z"
+}
+```
+
+---
+
+## DELETE /adapters/:adapter_id
+
+Delete an adapter and all its checkpoints.
+
+### Response
+
+```json
+{}
+```
+
+---
+
+## GET /adapters/:adapter_id/checkpoints
+
+List all checkpoints for an adapter.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| limit | integer | 20 | Maximum number of results |
+| cursor | string | — | Pagination cursor from previous response |
+
+### Response
+
+```json
+{
+  "checkpoints": [
+    {
+      "checkpoint_id": "abc123/chk_001",
+      "created_at": "2025-01-15T10:30:00Z"
+    }
+  ],
+  "next_cursor": "eyJpZCI6ImNoazAwMSJ9"
+}
+```
+
+---
+
+## DELETE /adapters/:adapter_id/checkpoints/:checkpoint_id
+
+Delete a specific checkpoint.
+
+### Response
+
+```json
+{}
+```
+
+---
+
+## POST /rollouts
+
+Generate rollouts for a training or evaluation request.
+
+### Request
+
+```json
+{
+  "adapter_id": "abc123",
+  "num_rollouts": 4,
+  "request": { ... },
+  "ground_truth": { ... }  // optional
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| adapter_id | string | yes | The adapter to use |
+| num_rollouts | integer | yes | Number of attempts to generate (1–16) |
+| request | object | yes | Skill-specific request (see below) |
+| ground_truth | object | no | Ground truth for automatic reward computation (point/detect only) |
+
+### Skill requests
+
+**Query**
+
+```json
+{
+  "skill": "query",
+  "question": "What color is the car?",
+  "image_url": "data:image/jpeg;base64,...",  // optional
+  "settings": {
+    "temperature": 1.0,
+    "top_p": 1.0,
+    "max_tokens": 128
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| skill | string | yes | Must be `"query"` |
+| question | string | yes | The question to answer |
+| image_url | string | no | Base64 data URL of the image |
+| settings | object | no | Generation settings |
+
+**Point**
+
+```json
+{
+  "skill": "point",
+  "object": "the red button",
+  "image_url": "data:image/jpeg;base64,...",
+  "settings": {
+    "temperature": 1.0,
+    "top_p": 1.0,
+    "max_tokens": 128
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| skill | string | yes | Must be `"point"` |
+| object | string | yes | Description of the object to point to |
+| image_url | string | yes | Base64 data URL of the image |
+| settings | object | no | Generation settings |
+
+**Detect**
+
+```json
+{
+  "skill": "detect",
+  "object": "vehicles",
+  "image_url": "data:image/jpeg;base64,...",
+  "settings": {
+    "temperature": 1.0,
+    "top_p": 1.0,
+    "max_tokens": 256,
+    "max_objects": 8
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| skill | string | yes | Must be `"detect"` |
+| object | string | yes | Description of objects to detect |
+| image_url | string | yes | Base64 data URL of the image |
+| settings | object | no | Generation settings (includes `max_objects`) |
+
+### Settings
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| temperature | number | 1.0 | Controls randomness (0 = deterministic) |
+| top_p | number | 1.0 | Nucleus sampling threshold |
+| max_tokens | integer | 128 | Maximum output length |
+| max_objects | integer | — | Maximum objects to detect (detect only) |
+
+### Ground truth
+
+**Point** — coordinates:
+
+```json
+{
+  "points": [{ "x": 0.52, "y": 0.31 }]
+}
+```
+
+**Point** — bounding boxes (rewards based on containment):
+
+```json
+{
+  "boxes": [{ "x_min": 0.1, "y_min": 0.2, "x_max": 0.4, "y_max": 0.6 }]
+}
+```
+
+**Detect**:
+
+```json
+{
+  "boxes": [
+    { "x_min": 0.1, "y_min": 0.2, "x_max": 0.4, "y_max": 0.6 }
+  ]
+}
+```
+
+All coordinates are normalized to 0–1.
+
+### Response
+
+```json
+{
+  "request": { ... },
+  "rollouts": [
+    {
+      "skill": "detect",
+      "output": {
+        "boxes": [
+          { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
+        ]
+      },
+      "answer_tokens": [...],
+      "coords": [...]
+    }
+  ],
+  "rewards": [0.8, 0.3, 0.6, 0.5]
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| request | object | Echoed request |
+| rollouts | array | Generated rollouts |
+| rewards | array \| null | Computed rewards if ground truth was provided |
+
+### Rollout output by skill
+
+**Query**:
+
+```json
+{
+  "answer": "The car is red."
+}
+```
+
+**Point**:
+
+```json
+{
+  "points": [{ "x": 0.52, "y": 0.31 }]
+}
+```
+
+**Detect**:
+
+```json
+{
+  "boxes": [
+    { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
+  ]
+}
+```
+
+---
+
+## POST /train_step
+
+Apply one training step using scored rollouts.
+
+### Request
+
+```json
+{
+  "adapter_id": "abc123",
+  "groups": [
+    {
+      "request": { ... },
+      "rollouts": [ ... ],
+      "rewards": [0.8, 0.3, 0.6, 0.5]
+    }
+  ]
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| adapter_id | string | yes | The adapter to train |
+| groups | array | yes | List of training groups |
+
+Each group:
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| request | object | yes | The echoed request from /rollouts response |
+| rollouts | array | yes | The rollout objects from /rollouts response (pass unchanged) |
+| rewards | array | yes | Reward for each rollout (same length and order) |
+
+You can mix skills across groups in the same train step.
+
+### Response
+
+```json
+{}
+```
