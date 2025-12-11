@@ -7,7 +7,7 @@ description: Experience powerful vision AI on your machine — fast, private, an
 
 # Run Moondream Locally
 
-There are two ways to run Moondream locally. Moondream Station is a ready-to-use Python package that downloads and manages Moondream models, accessible via console or API (100% compatible with Moondream Cloud API). For more control, integrate Moondream directly using the HuggingFace Transformers Python API—useful when you need direct bindings or custom packaging.
+There are two ways to run Moondream locally. Moondream Station is a ready-to-use Python package that downloads and manages Moondream models, accessible via console or API (100% compatible with Moondream Cloud API). For more control, integrate Moondream directly using the Hugging Face Transformers Python API—useful when you need direct bindings or custom packaging.
 
 ---
 
@@ -40,14 +40,13 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
     <div className="card" style={{height: '100%'}}>
       <div className="card__header">
         <span className="badge badge--warning badge-spaced">ADVANCED</span>
-        <h3>🔧 HuggingFace Transformers</h3>
+        <h3>🔧 Hugging Face Transformers</h3>
       </div>
       <div className="card__body">
-        <p>Full control over the model for custom integration and fine-tuning.</p>
+        <p>Full control over the model for custom integrations.</p>
         <ul>
           <li>✓ Direct model access</li>
           <li>✓ Custom configurations</li>
-          <li>✓ Fine-tuning support</li>
           <li>✓ For developers</li>
         </ul>
       </div>
@@ -58,16 +57,3 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
   </div>
 </div>
 
----
-
-## Next steps
-
-- Visit the [Moondream Station guide](/station) for the fastest way to start.
-- Explore the [HuggingFace Transformers setup](/transformers) for full control.
-
-## Need Help?
-
-- 📚 [Documentation](https://docs.moondream.ai)
-- 💬 [Discord Community](https://discord.gg/moondream)
-- 🐛 [GitHub Issues](https://github.com/vikhyat/moondream)
-- 🤗 [HuggingFace Model](https://huggingface.co/vikhyatk/moondream2)

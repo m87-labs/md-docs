@@ -1,14 +1,15 @@
 ---
-title: 'Using Moondream with Transformers'
-description: 'A guide for getting started with Moondream on Hugging Face Transformers'
-sidebar_position: 1
+id: transformers
+slug: transformers
+title: Hugging Face Transformers
+description: Full control over Moondream for custom integrations
 ---
 
 import CodeBlock from '@theme/CodeBlock';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Using Moondream with Transformers
+# Hugging Face Transformers
 
 Basic and advanced features of Moondream on Hugging Face Transformers.
 

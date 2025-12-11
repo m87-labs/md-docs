@@ -1,32 +1,26 @@
+---
+id: station
+slug: station
+title: Moondream Station
+description: The easiest way to run Moondream locally — zero configuration, automatic setup, CLI and HTTP access
+---
+
 # Moondream Station
-
-**Moondream Station: Local Visual Reasoning**
-
-## How It Works
-
-🚀 **Launches Local Server**  
-All inference runs on your device
-
-🔧 **Control via CLI**  
-Caption images, answer questions, and manage settings
-
-🌐 **Access via HTTP**  
-Connect to http://localhost:2020/v1 through REST or our [Python](https://pypi.org/project/moondream/), [Node](https://www.npmjs.com/package/moondream), or [OpenAI](https://github.com/openai/openai-python) client
 
 ## Installation
 
 Install from PyPI:
 
 ```bash
-$ pip install moondream-station
+pip install moondream-station
 ```
 
 Install from source:
 
 ```bash
-$ git clone https://github.com/m87-labs/moondream-station.git
-$ cd moondream-station
-$ pip install -e .
+git clone https://github.com/m87-labs/moondream-station.git
+cd moondream-station
+pip install -e .
 ```
 
 That's it! Moondream Station will automatically set itself up.
@@ -38,7 +32,7 @@ That's it! Moondream Station will automatically set itself up.
 To fire up Moondream Station, execute this command in your terminal:
 
 ```bash
-$ moondream-station
+moondream-station
 ```
 
 ### Model Management
@@ -50,7 +44,7 @@ By default, Moondream Station uses the latest model your machine supports. If yo
 
 ### Service Control
 
-We like to think Moondream has 20/20 vision; that's why, by default, we launch Moondream Station on port 2020. If that port is taken, Moondream Station will try a nearby free port. Additionally, you can control the port and status of the inference service with the following commands:
+By default, Moondream Station runs on port 2020. If that port is taken, Moondream Station will try a nearby free port. Additionally, you can control the port and status of the inference service with the following commands:
 
 - `start [port]` - Start REST server (default: port 2020)
 - `stop` - Stop server
