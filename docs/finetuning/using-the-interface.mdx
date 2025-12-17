@@ -25,10 +25,14 @@ Before training, create an adapter to hold your finetuned weights:
 
 You provide:
 
-- **`name`** — a human-readable name for this adapter.
-- **`rank`** — the LoRA rank, either 16 or 32 (higher = more capacity, but slower).
+- **`adapter`** — a unique identifier for this adapter (alphanumeric, hyphens, and underscores only).
+- **`rank`** — the LoRA rank: 8, 16, 24, or 32 (must be a multiple of 8; higher = more capacity, but slower).
 
-The response includes an **`adapter_id`** that you'll use for all subsequent calls.
+The response includes:
+
+- **`adapter`** — the adapter identifier you provided
+- **`rank`** — the LoRA rank
+- **`created`** — `true` if newly created, `false` if an adapter with this name already existed
 
 ## Generate rollouts
 
@@ -142,7 +146,7 @@ Here's a complete request/response cycle for the `detect` skill. Other skills fo
 ```json
 // POST /adapters
 {
-  "name": "vehicle-detector",
+  "adapter": "vehicle-detector",
   "rank": 32
 }
 ```
@@ -151,7 +155,9 @@ Response:
 
 ```json
 {
-  "adapter_id": "abc123"
+  "adapter": "vehicle-detector",
+  "rank": 32,
+  "created": true
 }
 ```
 
@@ -160,7 +166,7 @@ Response:
 ```json
 // POST /rollouts
 {
-  "adapter": "abc123",
+  "adapter": "vehicle-detector",
   "num_rollouts": 4,
   "request": {
     "skill": "detect",
@@ -206,14 +212,15 @@ If you provided `ground_truth`, rewards are computed automatically. Otherwise, `
 ```json
 // POST /train_step
 {
-  "adapter": "abc123",
+  "adapter": "vehicle-detector",
   "groups": [
     {
       "request": { "...echoed request from rollouts response..." },
       "rollouts": [ "...rollout objects from rollouts response..." ],
       "rewards": [0.8, 0.3, 0.6, 0.5]
     }
-  ]
+  ],
+  "lr": 0.002
 }
 ```
 
@@ -232,7 +239,7 @@ For evaluation, request a single rollout with temperature set to zero for determ
 ```json
 // POST /rollouts
 {
-  "adapter": "abc123",
+  "adapter": "vehicle-detector",
   "num_rollouts": 1,
   "request": {
     "skill": "detect",

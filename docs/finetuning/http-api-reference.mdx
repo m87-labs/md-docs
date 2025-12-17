@@ -27,23 +27,31 @@ Create a new adapter for finetuning.
 
 ```json
 {
-  "name": "my-adapter",
+  "adapter": "my-adapter",
   "rank": 32
 }
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| name | string | yes | Human-readable name for this adapter |
-| rank | integer | yes | LoRA rank: 16 or 32 (higher = more capacity, but slower) |
+| adapter | string | yes | Unique identifier for this adapter (alphanumeric, hyphens, underscores) |
+| rank | integer | yes | LoRA rank: 8, 16, 24, or 32 (must be multiple of 8; higher = more capacity, but slower) |
 
 ### Response
 
 ```json
 {
-  "adapter_id": "abc123"
+  "adapter": "my-adapter",
+  "rank": 32,
+  "created": true
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| adapter | string | The adapter identifier |
+| rank | integer | The LoRA rank |
+| created | boolean | `true` if newly created, `false` if adapter already existed |
 
 ---
 
@@ -244,14 +252,15 @@ Apply one training step using scored rollouts.
 
 ```json
 {
-  "adapter": "abc123",
+  "adapter": "my-adapter",
   "groups": [
     {
       "request": { ... },
       "rollouts": [ ... ],
       "rewards": [0.8, 0.3, 0.6, 0.5]
     }
-  ]
+  ],
+  "lr": 0.002
 }
 ```
 
@@ -259,6 +268,7 @@ Apply one training step using scored rollouts.
 |-------|------|----------|-------------|
 | adapter | string | yes | The adapter to train |
 | groups | array | yes | List of training groups |
+| lr | number | no | Learning rate (default: 0.002) |
 
 Each group:
 
