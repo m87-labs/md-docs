@@ -133,37 +133,6 @@ data:image/webp;base64,UklGR...
 
 HTTP/HTTPS URLs are not supported. Images larger than ~8MB (decoded) or with very large dimensions will be rejected.
 
-## Checkpoints
-
-Save your adapter's state at any point during training:
-
-```json
-// POST /adapters/:adapter_id/checkpoint
-{}
-```
-
-Response:
-
-```json
-{
-  "checkpoint_id": "abc123/chk_001",
-  "created_at": "2025-01-15T10:30:00Z"
-}
-```
-
-To continue from a checkpoint, create a new adapter with `from_checkpoint`:
-
-```json
-// POST /adapters
-{
-  "name": "my-adapter-v2",
-  "rank": 32,
-  "from_checkpoint": "abc123/chk_001"
-}
-```
-
-This lets you roll back if a training run goes off track, or branch from a known-good state to try different reward functions.
-
 ## Example: detect skill
 
 Here's a complete request/response cycle for the `detect` skill. Other skills follow the same pattern—see the [HTTP API reference](/finetuning/http-api-reference) for full schemas.

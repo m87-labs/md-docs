@@ -107,17 +107,27 @@ Your orchestration code runs anywhere—no GPU required.
 
 ## Using your finetuned model
 
-Once you've trained an adapter and saved a checkpoint, use it for inference by passing the checkpoint ID to the `adapter` parameter in the standard Moondream API endpoints (`/query`, `/point`, `/detect`):
+To run inference with your finetuned adapter, use the `/rollouts` endpoint with `num_rollouts: 1` and `temperature: 0` for deterministic output:
 
 ```json
+// POST /v1/tuning/rollouts
 {
-  "image_url": "data:image/jpeg;base64,...",
-  "object": "vehicles",
-  "adapter": "abc123/chk_001"
+  "adapter": "my-adapter",
+  "num_rollouts": 1,
+  "request": {
+    "skill": "detect",
+    "object": "vehicles",
+    "image_url": "data:image/jpeg;base64,...",
+    "settings": {
+      "temperature": 0
+    }
+  }
 }
 ```
 
-See the main [API documentation](/api) for details on the inference endpoints.
+The response contains the model's prediction in the `rollouts[0].output` field.
+
+Support for using finetuned adapters with the standard inference endpoints (`/query`, `/point`, `/detect`) is coming soon.
 
 ## Next steps
 
