@@ -85,7 +85,7 @@ List all your adapters.
 {
   "adapters": [
     {
-      "adapter_id": "abc123",
+      "adapter": "abc123",
       "name": "vehicle-detector",
       "rank": 32,
       "created_at": "2025-01-15T10:00:00Z"
@@ -105,7 +105,7 @@ Get details for a specific adapter.
 
 ```json
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "name": "vehicle-detector",
   "rank": 32,
   "created_at": "2025-01-15T10:00:00Z"
@@ -173,7 +173,7 @@ Generate rollouts for a training or evaluation request.
 
 ```json
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "num_rollouts": 4,
   "request": { ... },
   "ground_truth": { ... }  // optional
@@ -182,7 +182,7 @@ Generate rollouts for a training or evaluation request.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| adapter_id | string | yes | The adapter to use |
+| adapter | string | yes | The adapter to use |
 | num_rollouts | integer | yes | Number of attempts to generate (1–16) |
 | request | object | yes | Skill-specific request (see below) |
 | ground_truth | object | no | Ground truth for automatic reward computation (point/detect only) |
@@ -196,6 +196,7 @@ Generate rollouts for a training or evaluation request.
   "skill": "query",
   "question": "What color is the car?",
   "image_url": "data:image/jpeg;base64,...",  // optional
+  "reasoning": false,  // optional
   "settings": {
     "temperature": 1.0,
     "top_p": 1.0,
@@ -209,6 +210,7 @@ Generate rollouts for a training or evaluation request.
 | skill | string | yes | Must be `"query"` |
 | question | string | yes | The question to answer |
 | image_url | string | no | Base64 data URL of the image |
+| reasoning | boolean | no | Enable extended reasoning (default: false) |
 | settings | object | no | Generation settings |
 
 **Point**
@@ -304,12 +306,11 @@ All coordinates are normalized to 0–1.
     {
       "skill": "detect",
       "output": {
-        "boxes": [
+        "objects": [
           { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
         ]
       },
-      "answer_tokens": [...],
-      "coords": [...]
+      // ... opaque training metadata
     }
   ],
   "rewards": [0.8, 0.3, 0.6, 0.5]
@@ -328,7 +329,8 @@ All coordinates are normalized to 0–1.
 
 ```json
 {
-  "answer": "The car is red."
+  "answer": "The car is red.",
+  "reasoning": null  // present if reasoning was enabled
 }
 ```
 
@@ -344,7 +346,7 @@ All coordinates are normalized to 0–1.
 
 ```json
 {
-  "boxes": [
+  "objects": [
     { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
   ]
 }
@@ -360,7 +362,7 @@ Apply one training step using scored rollouts.
 
 ```json
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "groups": [
     {
       "request": { ... },
@@ -373,7 +375,7 @@ Apply one training step using scored rollouts.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| adapter_id | string | yes | The adapter to train |
+| adapter | string | yes | The adapter to train |
 | groups | array | yes | List of training groups |
 
 Each group:

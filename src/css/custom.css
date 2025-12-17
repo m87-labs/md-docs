@@ -228,3 +228,9 @@
 code {
   padding: 0.1rem 0.35rem;
 }
+
+/* Underline links in documentation body only */
+.markdown a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

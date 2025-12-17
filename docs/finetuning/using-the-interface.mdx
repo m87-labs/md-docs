@@ -38,7 +38,7 @@ To start a training iteration, you call:
 
 You provide:
 
-- **`adapter_id`** — the adapter to use (from the create adapter call).
+- **`adapter`** — the adapter to use (from the create adapter call).
 - **A skill request** — one of `query`, `point`, or `detect`.
 - **`num_rollouts`** — how many attempts to generate for this request (currently 1–16).
 - **`ground_truth`** (optional) — for `point` and `detect`, you may include ground truth so rewards can be
@@ -191,7 +191,7 @@ Response:
 ```json
 // POST /rollouts
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "num_rollouts": 4,
   "request": {
     "skill": "detect",
@@ -216,12 +216,11 @@ Response:
     {
       "skill": "detect",
       "output": {
-        "boxes": [
+        "objects": [
           { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
         ]
       },
-      "answer_tokens": [...],
-      "coords": [...]
+      // ... opaque training metadata
     },
     // ... 3 more rollouts
   ],
@@ -229,7 +228,7 @@ Response:
 }
 ```
 
-The `output` field contains the model's prediction. Fields like `answer_tokens` and `coords` are opaque training metadata—pass them back unchanged.
+The `output` field contains the model's prediction. Other fields in the rollout object are opaque training metadata—pass them back unchanged.
 
 If you provided `ground_truth`, rewards are computed automatically. Otherwise, `rewards` is `null` and you compute them yourself.
 
@@ -238,7 +237,7 @@ If you provided `ground_truth`, rewards are computed automatically. Otherwise, `
 ```json
 // POST /train_step
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "groups": [
     {
       "request": { "...echoed request from rollouts response..." },
@@ -264,7 +263,7 @@ For evaluation, request a single rollout with temperature set to zero for determ
 ```json
 // POST /rollouts
 {
-  "adapter_id": "abc123",
+  "adapter": "abc123",
   "num_rollouts": 1,
   "request": {
     "skill": "detect",
