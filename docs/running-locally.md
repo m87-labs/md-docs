@@ -27,7 +27,7 @@ There are two ways to run Moondream locally. Moondream Station is a ready-to-use
           <li>✓ Automatic setup & updates</li>
           <li>✓ Works via CLI or HTTP API</li>
           <li>✓ Perfect for beginners</li>
-          <li>✓ Supports Moondream 2 and 3 Preview (Moondream 3 Preview not available on Mac yet)</li>
+          <li>✓ Supports Moondream 2 and 3 Preview</li>
         </ul>
       </div>
       <div className="card__footer">
