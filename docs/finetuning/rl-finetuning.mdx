@@ -91,9 +91,20 @@ These terms appear throughout the finetuning documentation:
 |------|---------|
 | **Rollout** | One output attempt from the model |
 | **Reward** | A score you assign to a rollout (higher = better) |
-| **Adapter** | The finetuned weights that layer on top of the base model (using LoRA) |
-| **Checkpoint** | A saved adapter so you can resume training or roll back |
+| **Adapter** | The finetuned weights that layer on top of the base model (using LoRA). Identified by a unique `adapter_id`. |
+| **Checkpoint** | A saved adapter state at a specific training step. Created automatically after each train step. |
+| **Release** | A checkpoint promoted for production use. Releases are persistent and optimized for inference. |
 | **Train step** | One update to the model based on a batch of scored rollouts |
+
+### Checkpoint lifecycle
+
+Checkpoints are created automatically when you apply a train step. By default, they expire after 24 hours to save storage. You can:
+
+- **Pin** a checkpoint to keep it indefinitely
+- **Release** a checkpoint to make it permanently available for inference
+- **Delete** a checkpoint early by setting its expiration to the past
+
+The latest checkpoint per adapter is never automatically deleted, ensuring you can always resume training.
 
 ## Architecture overview
 
@@ -107,12 +118,20 @@ Your orchestration code runs anywhere—no GPU required.
 
 ## Using your finetuned model
 
+Once you're happy with your model's performance, release a checkpoint to make it available for production:
+
+```
+POST /v1/tuning/adapters/:adapterId/checkpoints/:step/release
+```
+
+This creates an optimized, persistent version of your weights.
+
 To run inference with your finetuned adapter, use the `/rollouts` endpoint with `num_rollouts: 1` and `temperature: 0` for deterministic output:
 
 ```json
 // POST /v1/tuning/rollouts
 {
-  "adapter": "my-adapter",
+  "adapter_id": "01HXYZ...",
   "num_rollouts": 1,
   "request": {
     "skill": "detect",
