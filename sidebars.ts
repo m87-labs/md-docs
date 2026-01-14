@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
     'overview',
     'quickstart',
     'api',
+    'batch',
     'rate-limits',
     'streaming',
     'reasoning',
