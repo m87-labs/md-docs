@@ -59,19 +59,28 @@ INIT=$(curl -s -X POST "https://api.moondream.ai/v1/batch?action=mpu-create" \
 FILE_ID=$(echo $INIT | jq -r '.fileId')
 UPLOAD_ID=$(echo $INIT | jq -r '.uploadId')
 
-# Step 2: Upload the file (single part for files < 100MB)
-PART=$(curl -s -X PUT "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-uploadpart&uploadId=$UPLOAD_ID&partNumber=1" \
-  -H "X-Moondream-Auth: YOUR_API_KEY" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @batch_input.jsonl)
+# Step 2: Split file into 50MB chunks and upload each part
+CHUNK_SIZE=$((50 * 1024 * 1024))
+split -b $CHUNK_SIZE batch_input.jsonl chunk_
 
-ETAG=$(echo $PART | jq -r '.etag')
+PARTS="[]"
+PART_NUM=1
+for CHUNK in chunk_*; do
+  PART=$(curl -s -X PUT "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-uploadpart&uploadId=$UPLOAD_ID&partNumber=$PART_NUM" \
+    -H "X-Moondream-Auth: YOUR_API_KEY" \
+    -H "Content-Type: application/octet-stream" \
+    --data-binary @$CHUNK)
+  ETAG=$(echo $PART | jq -r '.etag')
+  PARTS=$(echo $PARTS | jq ". + [{\"partNumber\": $PART_NUM, \"etag\": \"$ETAG\"}]")
+  rm $CHUNK
+  PART_NUM=$((PART_NUM + 1))
+done
 
 # Step 3: Complete upload and start processing
 BATCH=$(curl -s -X POST "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-complete&uploadId=$UPLOAD_ID" \
   -H "X-Moondream-Auth: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"parts\": [{\"partNumber\": 1, \"etag\": \"$ETAG\"}]}")
+  -d "{\"parts\": $PARTS}")
 
 BATCH_ID=$(echo $BATCH | jq -r '.id')
 echo "Batch submitted: $BATCH_ID"
@@ -82,30 +91,35 @@ echo "Batch submitted: $BATCH_ID"
 
 ```python
 import requests
-import json
 
 API_KEY = "YOUR_API_KEY"
 BASE_URL = "https://api.moondream.ai/v1/batch"
 headers = {"X-Moondream-Auth": API_KEY}
+CHUNK_SIZE = 50 * 1024 * 1024  # 50MB chunks
 
 # Step 1: Initialize multipart upload
 init = requests.post(f"{BASE_URL}?action=mpu-create", headers=headers).json()
 file_id = init["fileId"]
 upload_id = init["uploadId"]
 
-# Step 2: Upload the file
+# Step 2: Upload in chunks
+parts = []
 with open("batch_input.jsonl", "rb") as f:
-    part = requests.put(
-        f"{BASE_URL}/{file_id}?action=mpu-uploadpart&uploadId={upload_id}&partNumber=1",
-        headers={**headers, "Content-Type": "application/octet-stream"},
-        data=f.read()
-    ).json()
+    part_number = 1
+    while chunk := f.read(CHUNK_SIZE):
+        part = requests.put(
+            f"{BASE_URL}/{file_id}?action=mpu-uploadpart&uploadId={upload_id}&partNumber={part_number}",
+            headers={**headers, "Content-Type": "application/octet-stream"},
+            data=chunk
+        ).json()
+        parts.append({"partNumber": part_number, "etag": part["etag"]})
+        part_number += 1
 
 # Step 3: Complete upload and start processing
 batch = requests.post(
     f"{BASE_URL}/{file_id}?action=mpu-complete&uploadId={upload_id}",
     headers=headers,
-    json={"parts": [{"partNumber": 1, "etag": part["etag"]}]}
+    json={"parts": parts}
 ).json()
 
 print(f"Batch submitted: {batch['id']}")
@@ -120,6 +134,7 @@ import fs from 'fs';
 const API_KEY = 'YOUR_API_KEY';
 const BASE_URL = 'https://api.moondream.ai/v1/batch';
 const headers = { 'X-Moondream-Auth': API_KEY };
+const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks
 
 // Step 1: Initialize multipart upload
 const init = await fetch(`${BASE_URL}?action=mpu-create`, {
@@ -128,16 +143,25 @@ const init = await fetch(`${BASE_URL}?action=mpu-create`, {
 
 const { fileId, uploadId } = init;
 
-// Step 2: Upload the file
+// Step 2: Upload in chunks
 const fileData = fs.readFileSync('batch_input.jsonl');
-const part = await fetch(
-  `${BASE_URL}/${fileId}?action=mpu-uploadpart&uploadId=${uploadId}&partNumber=1`,
-  {
-    method: 'PUT',
-    headers: { ...headers, 'Content-Type': 'application/octet-stream' },
-    body: fileData
-  }
-).then(r => r.json());
+const parts = [];
+
+for (let i = 0; i < fileData.length; i += CHUNK_SIZE) {
+  const chunk = fileData.subarray(i, i + CHUNK_SIZE);
+  const partNumber = Math.floor(i / CHUNK_SIZE) + 1;
+
+  const part = await fetch(
+    `${BASE_URL}/${fileId}?action=mpu-uploadpart&uploadId=${uploadId}&partNumber=${partNumber}`,
+    {
+      method: 'PUT',
+      headers: { ...headers, 'Content-Type': 'application/octet-stream' },
+      body: chunk
+    }
+  ).then(r => r.json());
+
+  parts.push({ partNumber, etag: part.etag });
+}
 
 // Step 3: Complete upload and start processing
 const batch = await fetch(
@@ -145,7 +169,7 @@ const batch = await fetch(
   {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ parts: [{ partNumber: 1, etag: part.etag }] })
+    body: JSON.stringify({ parts })
   }
 ).then(r => r.json());
 
@@ -363,7 +387,7 @@ Content-Type: application/octet-stream
 }
 ```
 
-For files larger than 100MB, consider uploading in multiple parts.
+**Important:** Each part must be under 100MB. Requests exceeding this limit will receive a `413 Request Entity Too Large` error. Split larger files into multiple parts (we recommend 50MB chunks for reliability).
 
 ### Complete upload
 
@@ -430,6 +454,7 @@ GET /v1/batch/:batchId
 | Limit | Value |
 |-------|-------|
 | Max file size | 2 GB |
+| Max part size | 100 MB (split larger files into multiple parts) |
 | Max lines per batch | 100,000 |
 | Max line size | 10 MB (~7.5 MB base64 image) |
 | Result retention | 7 days |
