@@ -91,20 +91,15 @@ These terms appear throughout the finetuning documentation:
 |------|---------|
 | **Rollout** | One output attempt from the model |
 | **Reward** | A score you assign to a rollout (higher = better) |
-| **Adapter** | The finetuned weights that layer on top of the base model (using LoRA). Identified by a unique `adapter_id`. |
-| **Checkpoint** | A saved adapter state at a specific training step. Created automatically after each train step. |
-| **Release** | A checkpoint promoted for production use. Releases are persistent and optimized for inference. |
+| **Finetune** | The finetuned weights that layer on top of the base model (using LoRA). Identified by a unique `finetune_id`. |
+| **Checkpoint** | A model state at a specific training step. Use **Save** to keep the current checkpoint and make it visible. |
 | **Train step** | One update to the model based on a batch of scored rollouts |
 
 ### Checkpoint lifecycle
 
-Checkpoints are created automatically when you apply a train step. By default, they expire after 24 hours to save storage. You can:
+Checkpoints represent model states at particular training steps. Use **Save** to keep the current checkpoint and make it visible; you can also delete saved checkpoints when they’re no longer needed.
 
-- **Pin** a checkpoint to keep it indefinitely
-- **Release** a checkpoint to make it permanently available for inference
-- **Delete** a checkpoint early by setting its expiration to the past
-
-The latest checkpoint per adapter is never automatically deleted, ensuring you can always resume training.
+The latest checkpoint per finetune is always available for resuming training.
 
 ## Architecture overview
 
@@ -118,20 +113,20 @@ Your orchestration code runs anywhere—no GPU required.
 
 ## Using your finetuned model
 
-Once you're happy with your model's performance, release a checkpoint to make it available for production:
+Once you're happy with your model's performance, save the current checkpoint so it’s available for inference:
 
 ```
-POST /v1/tuning/adapters/:adapterId/checkpoints/:step/release
+POST /v1/tuning/finetunes/:finetuneId/checkpoints/save
 ```
 
-This creates an optimized, persistent version of your weights.
+Saved checkpoints are persistent and available for inference.
 
-To run inference with your finetuned adapter, use the `/rollouts` endpoint with `num_rollouts: 1` and `temperature: 0` for deterministic output:
+To run inference with your finetune, use the `/rollouts` endpoint with `num_rollouts: 1` and `temperature: 0` for deterministic output:
 
 ```json
 // POST /v1/tuning/rollouts
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "num_rollouts": 1,
   "request": {
     "skill": "detect",
@@ -146,7 +141,7 @@ To run inference with your finetuned adapter, use the `/rollouts` endpoint with 
 
 The response contains the model's prediction in the `rollouts[0].output` field.
 
-Support for using finetuned adapters with the standard inference endpoints (`/query`, `/point`, `/detect`) is coming soon.
+Support for using finetunes with the standard inference endpoints (`/query`, `/point`, `/detect`) is coming soon.
 
 ## Next steps
 

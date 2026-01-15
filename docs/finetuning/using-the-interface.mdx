@@ -11,28 +11,28 @@ All endpoints use the base URL `https://api.moondream.ai/v1/tuning/`.
 
 At a high level, there are **three operations**:
 
-1. **Create an adapter** — set up a new adapter to train.
+1. **Create a finetune** — set up a new finetune to train.
 2. **Generate rollouts** — ask the model for multiple attempts.
 3. **Apply a train step** — send those attempts back with rewards so the model can learn.
 
 Everything else (sampling data, rewards, evaluation, stopping criteria) stays in your control.
 
-## Create an adapter
+## Create a finetune
 
-Before training, create an adapter to hold your finetuned weights:
+Before training, create a finetune to hold your finetuned weights:
 
-`POST /adapters`
+`POST /finetunes`
 
 You provide:
 
-- **`name`** — a unique name for this adapter (alphanumeric, hyphens, and underscores only).
+- **`name`** — a unique name for this finetune (alphanumeric, hyphens, and underscores only).
 - **`rank`** — the LoRA rank: 8, 16, 24, or 32 (must be a multiple of 8; higher = more capacity, but slower).
 
 The response includes:
 
-- **`adapter_id`** — a unique identifier (ULID) for the adapter. **Use this ID for all subsequent operations** (rollouts, training, releases).
+- **`finetune_id`** — a unique identifier (ULID) for the finetune. **Use this ID for all subsequent operations** (rollouts, training, checkpoints).
 
-If you call this endpoint again with the same name and rank, you'll get back the existing `adapter_id` (idempotent). If the name exists with a different rank, you'll get a 409 Conflict error
+If you call this endpoint again with the same name and rank, you'll get back the existing `finetune_id` (idempotent). If the name exists with a different rank, you'll get a 409 Conflict error
 
 ## Generate rollouts
 
@@ -42,7 +42,7 @@ To start a training iteration, you call:
 
 You provide:
 
-- **`adapter_id`** — the adapter ID (from the create adapter response).
+- **`finetune_id`** — the finetune ID (from the create finetune response).
 - **A skill request** — one of `query`, `point`, or `detect`.
 - **`num_rollouts`** — how many attempts to generate for this request (currently 1–16).
 - **`ground_truth`** (optional) — for `point` and `detect`, you may include ground truth so rewards can be
@@ -141,10 +141,10 @@ HTTP/HTTPS URLs are not supported. Images larger than ~8MB (decoded) or with ver
 
 Here's a complete request/response cycle for the `detect` skill. Other skills follow the same pattern—see the [HTTP API reference](/finetuning/http-api-reference) for full schemas.
 
-### 1. Create an adapter
+### 1. Create a finetune
 
 ```json
-// POST /adapters
+// POST /finetunes
 {
   "name": "vehicle-detector",
   "rank": 32
@@ -155,18 +155,18 @@ Response:
 
 ```json
 {
-  "adapter_id": "01HXYZ..."
+  "finetune_id": "01HXYZ..."
 }
 ```
 
-Store the `adapter_id`—you'll use it for all subsequent operations.
+Store the `finetune_id`—you'll use it for all subsequent operations.
 
 ### 2. Generate rollouts
 
 ```json
 // POST /rollouts
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "num_rollouts": 4,
   "request": {
     "skill": "detect",
@@ -212,7 +212,7 @@ If you provided `ground_truth`, rewards are computed automatically. Otherwise, `
 ```json
 // POST /train_step
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "groups": [
     {
       "request": { "...echoed request from rollouts response..." },
@@ -232,7 +232,7 @@ Response:
 
 You can batch multiple groups (from different images/requests) into a single train step.
 
-Each train step creates a checkpoint automatically. Checkpoints expire after 24 hours by default.
+Each train step creates a checkpoint automatically. Use **Save** to keep the current checkpoint and make it visible in the dashboard.
 
 ### Evaluation
 
@@ -241,7 +241,7 @@ For evaluation, request a single rollout with temperature set to zero for determ
 ```json
 // POST /rollouts
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "num_rollouts": 1,
   "request": {
     "skill": "detect",
@@ -258,53 +258,43 @@ During training, higher temperature (e.g., 1.0) encourages diverse rollouts. For
 
 Do **not** send evaluation rollouts to `/train_step`.
 
-### 4. Release for production
+### 4. Save for production
 
-When you're satisfied with your model's performance, promote a checkpoint to a release:
+When you're satisfied with your model's performance, save the current checkpoint:
 
 ```json
-// POST /adapters/01HXYZ.../checkpoints/500/release
+// POST /finetunes/01HXYZ.../checkpoints/save
 ```
 
-This creates a persistent, optimized version of your weights for inference. Released checkpoints never expire.
+Saved checkpoints are persistent and visible in the dashboard.
 
-You can list your releases with `GET /releases`, and view all checkpoints for an adapter with `GET /adapters/:adapterId/checkpoints`.
+You can list saved checkpoints with `GET /finetunes/:finetuneId/checkpoints`.
 
 ## Managing checkpoints
 
-Checkpoints are created automatically after each train step. By default, they expire after 24 hours to save storage.
+Training produces checkpoints at each step. Use **Save** to keep the current checkpoint and make it visible.
 
 **Checkpoint lifecycle:**
-- **Active** — checkpoint is available and not expired
-- **Expiring soon** — `expires_at` is approaching
-- **Expired** — past expiration, will be cleaned up (unless it's the latest checkpoint)
-- **Released** — promoted to a release, never expires
-
-**Important:** The latest checkpoint per adapter is never automatically deleted, even if expired. This ensures you can always resume training.
+- **Saved** — checkpoint is kept and visible in listings
+- **Deleted** — removed from listings and cleaned up asynchronously
 
 ### Saving checkpoints
 
-To keep a checkpoint beyond 24 hours, pin it:
+To keep a checkpoint, save the current checkpoint:
 
 ```json
-// PATCH /adapters/:adapterId/checkpoints/:step
-{
-  "expires_at": null
-}
+// POST /finetunes/:finetuneId/checkpoints/save
 ```
 
 ### Deleting checkpoints
 
-To delete a checkpoint early, set `expires_at` to a past timestamp:
+To delete a saved checkpoint, use:
 
 ```json
-// PATCH /adapters/:adapterId/checkpoints/:step
-{
-  "expires_at": "2020-01-01T00:00:00Z"
-}
+// DELETE /finetunes/:finetuneId/checkpoints/:step
 ```
 
-The checkpoint will be cleaned up on the next cleanup cycle.
+The checkpoint will be cleaned up shortly.
 
 ## Interface contracts and gotchas
 
@@ -315,8 +305,7 @@ Keep these rules in mind:
 - **Round‑trip rollout objects**. Don't edit, drop, or re‑serialize rollout metadata fields; pass them back as
   you received them.
 - **Use fresh rollouts**. Be cautious about reusing old rollouts after training updates—they were generated by a different version of the model.
-- **Store your adapter_id**. After creating an adapter, save the returned `adapter_id`. You'll need it for all subsequent operations.
-- **Checkpoints expire**. By default, checkpoints expire after 24 hours. Pin important checkpoints or release them to make them permanent.
+- **Store your finetune_id**. After creating a finetune, save the returned `finetune_id`. You'll need it for all subsequent operations.
 
 ## Next steps
 

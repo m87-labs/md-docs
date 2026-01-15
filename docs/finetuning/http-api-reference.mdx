@@ -19,43 +19,43 @@ Get your API key from the [Moondream Cloud Console](https://moondream.ai/c/cloud
 
 ---
 
-## POST /adapters
+## POST /finetunes
 
-Create a new adapter for finetuning.
+Create a new finetune.
 
 ### Request
 
 ```json
 {
-  "name": "my-adapter",
+  "name": "my-finetune",
   "rank": 32
 }
 ```
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| name | string | yes | Unique name for this adapter (alphanumeric, hyphens, underscores) |
+| name | string | yes | Unique name for this finetune (alphanumeric, hyphens, underscores) |
 | rank | integer | yes | LoRA rank: 8, 16, 24, or 32 (must be multiple of 8; higher = more capacity, but slower) |
 
 ### Response
 
 ```json
 {
-  "adapter_id": "01HXYZ..."
+  "finetune_id": "01HXYZ..."
 }
 ```
 
 | Field | Type | Description |
 |-------|------|-------------|
-| adapter_id | string | Unique identifier (ULID) for the adapter. Use this ID for all subsequent operations. |
+| finetune_id | string | Unique identifier (ULID) for the finetune. Use this ID for all subsequent operations. |
 
-If an adapter with the same name already exists with the same rank, the existing `adapter_id` is returned (idempotent). If the name exists with a different rank, returns 409 Conflict.
+If a finetune with the same name already exists with the same rank, the existing `finetune_id` is returned (idempotent). If the name exists with a different rank, returns 409 Conflict.
 
 ---
 
-## GET /adapters
+## GET /finetunes
 
-List all adapters for your organization.
+List all finetunes for your organization.
 
 ### Query parameters
 
@@ -68,12 +68,13 @@ List all adapters for your organization.
 
 ```json
 {
-  "adapters": [
+  "finetunes": [
     {
-      "adapter_id": "01HXYZ...",
-      "name": "my-adapter",
+      "finetune_id": "01HXYZ...",
+      "name": "my-finetune",
       "rank": 32,
-      "created_at": "2025-01-15T10:30:00Z"
+      "created_at_ms": 1736937000000,
+      "updated_at_ms": 1736937000000
     }
   ],
   "next_cursor": "eyJjIjoiMjAyNS0wMS0xNVQxMDozMDowMFoifQ==",
@@ -85,36 +86,36 @@ Results are ordered by creation time (oldest first).
 
 ---
 
-## GET /adapters/:adapterId
+## GET /finetunes/:finetuneId
 
-Get details for a specific adapter.
+Get details for a specific finetune.
 
 ### Response
 
 ```json
 {
-  "adapter_id": "01HXYZ...",
-  "name": "my-adapter",
+  "finetune_id": "01HXYZ...",
+  "name": "my-finetune",
   "rank": 32,
-  "created_at": "2025-01-15T10:30:00Z"
+  "created_at_ms": 1736937000000,
+  "updated_at_ms": 1736937000000
 }
 ```
 
-Returns 404 if the adapter does not exist.
+Returns 404 if the finetune does not exist.
 
 ---
 
-## DELETE /adapters/:adapterId
+## DELETE /finetunes/:finetuneId
 
-Delete an adapter. This is a soft delete—the adapter is marked as deleted and its checkpoints are cleaned up asynchronously.
+Delete a finetune. This is a soft delete—the finetune is marked as deleted and its checkpoints are cleaned up asynchronously.
 
 ### Response
 
-Returns 204 No Content on success.
+Returns `{ "ok": true }` on success.
 
 **Constraints:**
-- Returns 409 Conflict if the adapter has any releases. You must delete releases before deleting the adapter.
-- Returns 404 if the adapter does not exist.
+- Returns 404 if the finetune does not exist.
 
 ---
 
@@ -126,7 +127,7 @@ Generate rollouts for a training or evaluation request.
 
 ```json
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "num_rollouts": 4,
   "request": { ... },
   "ground_truth": { ... }  // optional
@@ -135,7 +136,7 @@ Generate rollouts for a training or evaluation request.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| adapter_id | string | yes | The adapter ID (from POST /adapters response) |
+| finetune_id | string | yes | The finetune ID (from POST /finetunes response) |
 | num_rollouts | integer | yes | Number of attempts to generate (1–16) |
 | request | object | yes | Skill-specific request (see below) |
 | ground_truth | object | no | Ground truth for automatic reward computation (point/detect only) |
@@ -315,7 +316,7 @@ Apply one training step using scored rollouts.
 
 ```json
 {
-  "adapter_id": "01HXYZ...",
+  "finetune_id": "01HXYZ...",
   "groups": [
     {
       "request": { ... },
@@ -329,7 +330,7 @@ Apply one training step using scored rollouts.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| adapter_id | string | yes | The adapter ID to train |
+| finetune_id | string | yes | The finetune ID to train |
 | groups | array | yes | List of training groups |
 | lr | number | no | Learning rate (default: 0.002) |
 
@@ -351,9 +352,9 @@ You can mix skills across groups in the same train step.
 
 ---
 
-## GET /adapters/:adapterId/checkpoints
+## GET /finetunes/:finetuneId/checkpoints
 
-List checkpoints for an adapter. Checkpoints are created automatically when training steps are applied.
+List saved checkpoints for a finetune.
 
 ### Query parameters
 
@@ -368,17 +369,11 @@ List checkpoints for an adapter. Checkpoints are created automatically when trai
 {
   "checkpoints": [
     {
+      "checkpoint_id": "01JXYZ...",
+      "finetune_id": "01HXYZ...",
       "step": 100,
-      "expires_at": "2025-01-16T10:30:00Z",
-      "released": false,
-      "created_at": "2025-01-15T10:30:00Z"
-    },
-    {
-      "step": 200,
-      "expires_at": null,
-      "released": true,
-      "released_at": "2025-01-15T12:00:00Z",
-      "created_at": "2025-01-15T11:30:00Z"
+      "created_at_ms": 1736937000000,
+      "updated_at_ms": 1736937600000
     }
   ],
   "next_cursor": "eyJzIjo1MDB9",
@@ -388,106 +383,53 @@ List checkpoints for an adapter. Checkpoints are created automatically when trai
 
 | Field | Type | Description |
 |-------|------|-------------|
+| checkpoint_id | string | Unique checkpoint identifier |
+| finetune_id | string | Finetune identifier |
 | step | integer | Training step number |
-| expires_at | string \| null | When this checkpoint expires, or `null` if pinned/released |
-| released | boolean | Whether this checkpoint has been promoted to a release |
-| released_at | string | When the release was created (only present if released) |
-| created_at | string | When the checkpoint was created |
+| created_at_ms | integer | Unix timestamp in milliseconds |
+| updated_at_ms | integer | Unix timestamp in milliseconds |
 
-Results are ordered by step (ascending).
-
-**Checkpoint states:**
-- **Active**: Has not expired yet, or is pinned (`expires_at` is `null`)
-- **Expiring soon**: `expires_at` is approaching
-- **Expired**: Past `expires_at` (will be cleaned up soon unless it's the latest checkpoint)
+Results are ordered by step (ascending). Only saved checkpoints are returned.
 
 ---
 
-## PATCH /adapters/:adapterId/checkpoints/:step
+## POST /finetunes/:finetuneId/checkpoints/save
 
-Modify a checkpoint's expiration. Use this to pin (save), extend, shorten, or delete checkpoints.
-
-### Request
-
-```json
-{
-  "expires_at": "2025-01-20T00:00:00Z"
-}
-```
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| expires_at | string \| null | yes | ISO 8601 timestamp, or `null` to pin (never expire) |
-
-**Operations:**
-- **Pin (save)**: Set `expires_at` to `null` — checkpoint never expires
-- **Extend**: Set `expires_at` further in the future
-- **Shorten**: Set `expires_at` closer (but still in the future)
-- **Delete**: Set `expires_at` to a past timestamp — checkpoint becomes eligible for cleanup
-
-### Response
-
-Returns 204 No Content on success.
-
-**Constraints:**
-- Cannot modify a checkpoint that has already been cleaned up (returns 410 Gone)
-- Cannot modify an expired checkpoint, except for the latest checkpoint per adapter
-- Cannot set a finite expiration on the latest checkpoint (returns 409 Conflict) — the latest checkpoint is always protected for training resumability
-- Cannot modify a released checkpoint (returns 409 Conflict)
-
----
-
-## POST /adapters/:adapterId/checkpoints/:step/release
-
-Promote a checkpoint to a release. Releases are persistent artifacts optimized for inference.
-
-When you release a checkpoint:
-1. The checkpoint is pinned (set to never expire)
-2. The LoRA weights are extracted and converted to an optimized format
-3. The release becomes available for inference
-
-### Response
-
-Returns 200 OK on success (empty body).
-
-**Constraints:**
-- Returns 404 if the checkpoint does not exist
-- Returns 410 Gone if the checkpoint was already cleaned up or expired (except for the latest checkpoint)
-- If already released, returns 200 OK (idempotent)
-
----
-
-## GET /releases
-
-List all releases for your organization.
-
-### Query parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| limit | integer | 50 | Maximum results per page (1–100) |
-| cursor | string | — | Pagination cursor from previous response |
+Save the current checkpoint and make it visible in the dashboard. The server resolves the
+current step for the finetune.
 
 ### Response
 
 ```json
 {
-  "releases": [
-    {
-      "adapter_id": "01HXYZ...",
-      "adapter_name": "my-detector",
-      "step": 5000
-    }
-  ],
-  "next_cursor": "eyJyIjoxNzA1MzEyMjA1MDAwfQ==",
-  "has_more": true
+  "ok": true,
+  "checkpoint": {
+    "checkpoint_id": "01JXYZ...",
+    "finetune_id": "01HXYZ...",
+    "step": 100,
+    "created_at_ms": 1736937000000,
+    "updated_at_ms": 1736937600000
+  }
 }
 ```
 
-| Field | Type | Description |
-|-------|------|-------------|
-| adapter_id | string | The adapter ID |
-| adapter_name | string | The adapter name |
-| step | integer | The training step that was released |
+**Constraints:**
+- Returns 404 if the finetune does not exist or no checkpoint is available.
+- Idempotent: repeated calls return success.
 
-Results are ordered by release time (newest first).
+---
+
+## DELETE /finetunes/:finetuneId/checkpoints/:step
+
+Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
+
+### Response
+
+```json
+{ "ok": true }
+```
+
+**Constraints:**
+- Returns 404 if the checkpoint does not exist.
+- Returns 409 if attempting to delete the latest checkpoint (protected for training resumability).
+- Returns 410 if the checkpoint was already deleted.
