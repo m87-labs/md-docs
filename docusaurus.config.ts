@@ -117,6 +117,10 @@ const config: Config = {
           position: 'left',
           target: '_self',
         },
+        {
+          type: 'search',
+          position: 'right',
+        },
       ],
     },
     /*
@@ -180,22 +184,20 @@ const config: Config = {
     // },
   } satisfies Preset.ThemeConfig,
 
-  // Local search plugin - commented out due to Node.js 18+ compatibility issues in CI
-  // To re-enable, uncomment the themes section below
-  // themes: [
-  //   [
-  //     require.resolve("@easyops-cn/docusaurus-search-local"),
-  //     /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
-  //     ({
-  //       hashed: true,
-  //       indexBlog: false,
-  //       indexDocs: true,
-  //       indexPages: false,
-  //       docsRouteBasePath: "/",
-  //       docsDir: ["docs"],
-  //     }),
-  //   ],
-  // ]
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        hashed: true,
+        indexBlog: false,
+        indexDocs: true,
+        indexPages: false,
+        docsRouteBasePath: '/',
+        docsDir: ['docs'],
+      }),
+    ],
+  ],
 };
 
 export default config;
