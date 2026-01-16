@@ -434,3 +434,52 @@ Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
 - Returns 410 if the checkpoint was already deleted.
 
 Deleting the latest checkpoint will prevent resuming training for that finetune.
+
+---
+
+## Using finetuned models for inference
+
+Once you have saved a checkpoint, you can use it for inference by specifying the `model` parameter in your API requests.
+
+### Model format
+
+```
+moondream3-preview/{finetune_id}@{step}
+```
+
+For example, if your finetune ID is `01HXYZ...` and you saved a checkpoint at step 500:
+
+```
+moondream3-preview/01HXYZ...@500
+```
+
+### Example: Query with a finetuned model
+
+```bash
+curl -X POST https://api.moondream.ai/v1/query \
+  -H "X-Moondream-Auth: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "moondream3-preview/01HXYZ...@500",
+    "image_url": "data:image/jpeg;base64,...",
+    "question": "What do you see?"
+  }'
+```
+
+### Supported endpoints
+
+The `model` parameter is supported on the following inference endpoints:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/v1/query` | Question answering |
+| `/v1/caption` | Image captioning |
+| `/v1/detect` | Object detection |
+| `/v1/point` | Point localization |
+
+### Notes
+
+- The `model` parameter is optional. If omitted, requests use the base `moondream3-preview` model.
+- Only saved checkpoints can be used for inference. Use `POST /finetunes/:finetuneId/checkpoints/save` to save a checkpoint first.
+- Both the `finetune_id` and `step` are required in the model string.
+- Finetune inference is only available for authenticated API requests (not available in playground mode).

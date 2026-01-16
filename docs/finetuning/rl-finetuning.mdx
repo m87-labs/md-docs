@@ -113,7 +113,7 @@ Your orchestration code runs anywhere—no GPU required.
 
 ## Using your finetuned model
 
-Once you're happy with your model's performance, save the current checkpoint so it’s available for inference:
+Once you're happy with your model's performance, save the current checkpoint so it's available for inference:
 
 ```
 POST /v1/tuning/finetunes/:finetuneId/checkpoints/save
@@ -121,27 +121,28 @@ POST /v1/tuning/finetunes/:finetuneId/checkpoints/save
 
 Saved checkpoints are persistent and available for inference.
 
-To run inference with your finetune, use the `/rollouts` endpoint with `num_rollouts: 1` and `temperature: 0` for deterministic output:
+To run inference with your finetune, use the standard inference endpoints with the `model` parameter set to your finetune checkpoint:
 
 ```json
-// POST /v1/tuning/rollouts
+// POST /v1/query (or /caption, /detect, /point)
 {
-  "finetune_id": "01HXYZ...",
-  "num_rollouts": 1,
-  "request": {
-    "skill": "detect",
-    "object": "vehicles",
-    "image_url": "data:image/jpeg;base64,...",
-    "settings": {
-      "temperature": 0
-    }
-  }
+  "model": "moondream3-preview/{finetune_id}@{step}",
+  "image_url": "data:image/jpeg;base64,...",
+  "question": "What do you see?"
 }
 ```
 
-The response contains the model's prediction in the `rollouts[0].output` field.
+For example, if your finetune ID is `01HXYZ...` and you saved a checkpoint at step 500:
 
-Support for using finetunes with the standard inference endpoints (`/query`, `/point`, `/detect`) is coming soon.
+```json
+{
+  "model": "moondream3-preview/01HXYZ...@500",
+  "image_url": "data:image/jpeg;base64,...",
+  "object": "vehicles"
+}
+```
+
+See the [HTTP API reference](/finetuning/http-api-reference#using-finetuned-models-for-inference) for full details on using finetuned models for inference.
 
 ## Next steps
 
