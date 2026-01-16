@@ -431,5 +431,6 @@ Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
 
 **Constraints:**
 - Returns 404 if the checkpoint does not exist.
-- Returns 409 if attempting to delete the latest checkpoint (protected for training resumability).
 - Returns 410 if the checkpoint was already deleted.
+
+Deleting the latest checkpoint will prevent resuming training for that finetune.
