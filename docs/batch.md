@@ -7,7 +7,7 @@ sidebar_position: 3
 
 The Batch API lets you process large volumes of images asynchronously. Upload a JSONL file with thousands of requests, and download results when processing completes. Batch processing is ideal for offline workloads like dataset annotation, bulk captioning, or large-scale image analysis.
 
-**Pricing:** Batch API requests are billed at **50% off** standard API pricing.
+**Pricing:** Batch API requests are billed at **50% off** standard API pricing. When using finetuned models, batch pricing is 50% off finetune pricing. See [pricing](https://moondream.ai/pricing) for details.
 
 ## When to use Batch API
 
@@ -229,7 +229,7 @@ while (true) {
 {
   "id": "01JQXYZ9ABCDEF123456",
   "status": "processing",
-  "model": "moondream-3-preview",
+  "model": "moondream3-preview",
   "progress": { "total": 1000, "completed": 450 },
   "created_at": "2025-01-10T12:00:00Z"
 }
@@ -240,7 +240,7 @@ while (true) {
 {
   "id": "01JQXYZ9ABCDEF123456",
   "status": "completed",
-  "model": "moondream-3-preview",
+  "model": "moondream3-preview",
   "progress": { "total": 1000, "completed": 998, "failed": 2 },
   "usage": { "input_tokens": 1500000, "output_tokens": 50000 },
   "outputs": [
@@ -398,9 +398,15 @@ Content-Type: application/json
 {
   "parts": [
     { "partNumber": 1, "etag": "\"abc123...\"" }
-  ]
+  ],
+  "model": "moondream3-preview/finetune_id@step"
 }
 ```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `parts` | array | Yes | Array of uploaded parts with `partNumber` and `etag` |
+| `model` | string | No | Model to use. Default: `moondream3-preview`. For finetunes: `moondream3-preview/finetune_id@step` |
 
 **Response:**
 ```json
@@ -465,6 +471,7 @@ GET /v1/batch/:batchId
 
 | Code | Description |
 |------|-------------|
+| `invalid_model` | Model format invalid (must be `moondream3-preview` or `moondream3-preview/finetune_id@step`) |
 | `validation_error` | Invalid JSONL, blank lines, or bad UTF-8 |
 | `limit_exceeded` | File or line limits exceeded |
 | `empty_batch` | No valid lines in file |
@@ -479,6 +486,26 @@ GET /v1/batch/:batchId
 | `image_decode_failed` | Corrupt or invalid image data |
 | `unknown_skill` | Unrecognized skill name |
 | `processing_error` | Failed during inference |
+
+## Using finetuned models
+
+You can run batch jobs using your finetuned models by specifying the `model` parameter when completing the upload:
+
+```bash
+curl -s -X POST "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-complete&uploadId=$UPLOAD_ID" \
+  -H "X-Moondream-Auth: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "parts": [...],
+    "model": "moondream3-preview/YOUR_FINETUNE_ID@STEP"
+  }'
+```
+
+The model format is `moondream3-preview/finetune_id@step`, where:
+- `finetune_id` is your finetune's ID (e.g., `01JQXYZ...`)
+- `step` is the checkpoint step number
+
+All lines in a batch use the same model. The finetune must have a [saved checkpoint](/finetuning/http-api-reference#save-checkpoint).
 
 ## Best practices
 
