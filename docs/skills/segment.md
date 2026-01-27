@@ -221,6 +221,49 @@ svg.appendChild(pathEl);
 container.appendChild(svg);
 ```
 
+### Rasterizing and Overlaying in Python
+
+Use an SVG renderer to rasterize and overlay the mask.
+
+```python
+import io
+from PIL import Image
+import cairosvg
+
+
+def rasterize_mask(svg_path: str, bbox: dict, image_size: tuple[int, int]) -> Image.Image:
+    """Return a PIL mask image (0 = background, 255 = mask)."""
+    img_w, img_h = image_size
+    x_min, y_min = bbox["x_min"], bbox["y_min"]
+    w = bbox["x_max"] - bbox["x_min"]
+    h = bbox["y_max"] - bbox["y_min"]
+
+    svg = f"""<svg viewBox=\"0 0 1 1\" width=\"{img_w}\" height=\"{img_h}\" preserveAspectRatio=\"none\">
+  <g style=\"position: absolute; left: {x_min * 100}%; top: {y_min * 100}%; width: {w * 100}%; height: {h * 100}%; transform-origin: 0 0; transform: scale({w} {h});\">    <path d=\"{svg_path}\" fill=\"white\" />
+  </g>
+</svg>"""
+
+    png_bytes = cairosvg.svg2png(
+        bytestring=svg.encode("utf-8"),
+        output_width=img_w,
+        output_height=img_h,
+    )
+    return Image.open(io.BytesIO(png_bytes)).convert("L")
+
+
+# Overlay + save
+image = Image.open("input.jpg").convert("RGB")
+result = model.segment(image, "cat")
+
+mask = rasterize_mask(result["path"], result["bbox"], image.size)
+
+red = Image.new("RGB", image.size, (255, 0, 0))
+overlay = Image.composite(red, image, mask)
+overlay.save("output.png")
+```
+
+This keeps the path in bbox space (viewBox 0–1) and uses SVG sizing to place it on the image before rasterizing.
+
 ## Segment vs. Detect
 
 | Feature | Segment | Detect |
