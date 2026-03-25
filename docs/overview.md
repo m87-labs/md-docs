@@ -8,7 +8,7 @@ title: "Overview"
 
 Moondream is an open-source family of Vision Language Models (VLMs) built for powerful, efficient visual reasoning. Our newest release, Moondream 3 Preview, is a mixture-of-experts model with grounded visual reasoning, a 32k context window, and native support for multiple vision skills—like pointing, counting, and object detection—all designed with a deployment-friendly ethos.
 
-Moondream 3 Preview is now the default model for our cloud API and local processing with Moondream Station – [get started here](./quickstart).
+Moondream 3 Preview is now the default model for our cloud API and local processing with [Photon](/running-locally) – [get started here](./quickstart).
 
 ### Key stats
 
@@ -31,16 +31,16 @@ Here are some early benchmark results. We show it alongside some top frontier mo
 | Task | Moondream 3 Preview | GPT 5 | Gemini 2.5-Flash | Claude 4 Sonnet |
 |------|---------------------|-------|------------------|-----------------|
 | **Object Detection** | | | | |
-| refcocog | **88.6** | 49.8 | 75.1 | 26.2 |
-| refcoco+ | **81.8** | 46.3 | 70.2 | 23.4 |
-| refcoco | **91.1** | 57.2 | 75.8 | 30.1 |
+| RefCOCOg | **88.6** | 49.8 | 75.1 | 26.2 |
+| RefCOCO+ | **81.8** | 46.3 | 70.2 | 23.4 |
+| RefCOCO | **91.1** | 57.2 | 75.8 | 30.1 |
 | **Counting** | | | | |
-| CountbenchQA | **93.2** | 89.3 | 81.2 | 90.1 |
+| CountBenchQA | **93.2** | 89.3 | 81.2 | 90.1 |
 | **Document Understanding** | | | | |
 | ChartQA | **86.6** | 85* | 79.5 | 74.3* |
 | DocVQA | **88.3** | 89* | **94.2** | 89.5* |
 | **Hallucination** (higher is better) | | | | |
-| pope | **89.0** | 88.4 | 88.1 | 84.6 |
+| POPE | **89.0** | 88.4 | 88.1 | 84.6 |
 
 ### License
 

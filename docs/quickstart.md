@@ -338,10 +338,7 @@ console.log(result.caption);
 
 ## Running Locally
 
-Want to run Moondream on your own hardware instead of using the Cloud API?
-
-- **Mac/Linux**: Use [Moondream Station](/station) - the easiest way to run locally
-- **Advanced**: Use [Hugging Face Transformers](/transformers) for custom integration
+Want to run Moondream on your own hardware instead of using the Cloud API? Check out our [guide to running locally](/running-locally).
 
 ## Next Steps
 

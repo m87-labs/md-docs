@@ -171,8 +171,8 @@ const config: Config = {
     },
     */
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.oneLight,
+      darkTheme: prismThemes.oneDark,
       additionalLanguages: ['bash', 'shell-session', 'json', 'python', 'javascript', 'typescript'],
     },
     // Algolia DocSearch configuration (official Docusaurus search)
