@@ -150,6 +150,7 @@ Generate rollouts for a training or evaluation request.
   "skill": "query",
   "question": "What color is the car?",
   "image_url": "data:image/jpeg;base64,...",  // optional
+  "spatial_refs": [[0.1, 0.1, 0.5, 0.5]],  // optional
   "reasoning": false,  // optional
   "settings": {
     "temperature": 1.0,
@@ -164,6 +165,7 @@ Generate rollouts for a training or evaluation request.
 | skill | string | yes | Must be `"query"` |
 | question | string | yes | The question to answer |
 | image_url | string | no | Base64 data URL of the image |
+| spatial_refs | array | no | Normalized point or box references for grounding |
 | reasoning | boolean | no | Enable extended reasoning (default: false) |
 | settings | object | no | Generation settings |
 
@@ -251,6 +253,10 @@ Generate rollouts for a training or evaluation request.
 
 All coordinates are normalized to 0–1.
 
+`ground_truth` is only supported for `point` and `detect` on `/rollouts`.
+
+For query SFT, use `POST /train_step` with `mode: "sft"` and `targets`.
+
 ### Response
 
 ```json
@@ -267,7 +273,7 @@ All coordinates are normalized to 0–1.
       // ... opaque training metadata
     }
   ],
-  "rewards": [0.8, 0.3, 0.6, 0.5]
+  "rewards": [0.8]
 }
 ```
 
@@ -284,7 +290,10 @@ All coordinates are normalized to 0–1.
 ```json
 {
   "answer": "The car is red.",
-  "reasoning": null  // present if reasoning was enabled
+  "reasoning": {
+    "text": "The car body appears red.",
+    "grounding": []
+  }
 }
 ```
 
@@ -310,7 +319,7 @@ All coordinates are normalized to 0–1.
 
 ## POST /train_step
 
-Apply one training step using scored rollouts.
+Apply one training step using RL or SFT.
 
 ### Request
 
@@ -319,6 +328,7 @@ Apply one training step using scored rollouts.
   "finetune_id": "01HXYZ...",
   "groups": [
     {
+      "mode": "rl",
       "request": { ... },
       "rollouts": [ ... ],
       "rewards": [0.8, 0.3, 0.6, 0.5]
@@ -334,21 +344,88 @@ Apply one training step using scored rollouts.
 | groups | array | yes | List of training groups |
 | lr | number | no | Learning rate (default: 0.002) |
 
+**RL group**
+
+```json
+{
+  "mode": "rl",
+  "request": { ... },
+  "rollouts": [ ... ],
+  "rewards": [0.8, 0.3, 0.6, 0.5]
+}
+```
+
+**SFT group**
+
+```json
+{
+  "mode": "sft",
+  "request": {
+    "skill": "query",
+    "question": "What country is this?",
+    "image_url": "data:image/jpeg;base64,...",
+    "reasoning": false,
+    "settings": {
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "max_tokens": 16
+    }
+  },
+  "targets": [
+    {
+      "answer": "United States"
+    }
+  ]
+}
+```
+
 Each group:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| request | object | yes | The echoed request from /rollouts response |
-| rollouts | array | yes | The rollout objects from /rollouts response (pass unchanged) |
-| rewards | array | yes | Reward for each rollout (same length and order) |
+| mode | string | no | `"rl"` or `"sft"` |
+| request | object | yes | Rollouts request for RL, or skill request for SFT |
+| rollouts | array | RL only | Rollout objects from `/rollouts` (pass unchanged) |
+| rewards | array | RL only | Reward for each rollout (same length and order) |
+| targets | array | SFT only | Target objects for supervised training |
 
 You can mix skills across groups in the same train step.
+
+For query SFT:
+- `targets` entries use `answer`
+- `reasoning` is required when `request.reasoning=true`
+- omit `reasoning` when `request.reasoning=false`
+
+For point SFT:
+- each target must include either `points` or `boxes`
+
+For detect SFT:
+- each target must include `boxes`
 
 ### Response
 
 ```json
-{}
+{
+  "step": 101,
+  "applied": true,
+  "kl": 0.12,
+  "router_kl": 0.03,
+  "grad_norm": 2.5,
+  "reward_mean": 0.58,
+  "reward_std": 0.19
+}
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| step | integer | Training step after this request |
+| applied | boolean | Whether the step was applied |
+| kl | number \| null | RL KL term |
+| router_kl | number \| null | Router KL regularizer |
+| grad_norm | number \| null | Gradient norm for the step |
+| sft_loss | number \| null | SFT loss when SFT groups are included |
+| reward_mean | number \| null | Mean reward across RL groups |
+| reward_std | number \| null | Reward standard deviation across RL rollouts |
 
 ---
 
@@ -434,6 +511,30 @@ Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
 - Returns 410 if the checkpoint was already deleted.
 
 Deleting the latest checkpoint will prevent resuming training for that finetune.
+
+---
+
+## GET /finetunes/:finetuneId/checkpoints/:step/download
+
+Get a presigned URL for downloading a saved checkpoint.
+
+### Response
+
+```json
+{
+  "url": "https://...",
+  "expires_in": 3600
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| url | string | Presigned download URL |
+| expires_in | integer | URL lifetime in seconds |
+
+**Constraints:**
+- Returns 404 if the finetune or checkpoint does not exist.
+- Returns 410 if the checkpoint has expired or been deleted.
 
 ---
 
