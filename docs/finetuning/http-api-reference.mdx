@@ -265,12 +265,17 @@ For query SFT, use `POST /train_step` with `mode: "sft"` and `targets`.
   "rollouts": [
     {
       "skill": "detect",
+      "finish_reason": "stop",
       "output": {
         "objects": [
           { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
         ]
       },
-      // ... opaque training metadata
+      "answer_tokens": [],
+      "thinking_tokens": [],
+      "has_answer_separator": false,
+      "coords": [],
+      "sizes": []
     }
   ],
   "rewards": [0.8]
@@ -282,6 +287,21 @@ For query SFT, use `POST /train_step` with `mode: "sft"` and `targets`.
 | request | object | Echoed request |
 | rollouts | array | Generated rollouts |
 | rewards | array \| null | Computed rewards if ground truth was provided |
+
+Each rollout also includes the following training fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| skill | string | Skill for this rollout (`query`, `point`, or `detect`) |
+| finish_reason | string | Generation stop reason |
+| output | object | Skill output |
+| answer_tokens | array | Answer token IDs used for training |
+| thinking_tokens | array | Reasoning token IDs used for training |
+| has_answer_separator | boolean | Whether an answer separator token was used |
+| coords | array | Coordinate token data used for training |
+| sizes | array | Size token data used for training |
+
+Pass these fields back unchanged when sending RL rollouts to `POST /train_step`.
 
 ### Rollout output by skill
 
