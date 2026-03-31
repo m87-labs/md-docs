@@ -128,7 +128,7 @@ Generate rollouts for a training or evaluation request.
 ```json
 {
   "finetune_id": "01HXYZ...",
-  "num_rollouts": 4,
+  "num_rollouts": 1,
   "request": { ... },
   "ground_truth": { ... }  // optional
 }
@@ -165,7 +165,7 @@ Generate rollouts for a training or evaluation request.
 | skill | string | yes | Must be `"query"` |
 | question | string | yes | The question to answer |
 | image_url | string | no | Base64 data URL of the image |
-| spatial_refs | array | no | Normalized point or box references for grounding |
+| spatial_refs | array | no | Array of spatial references, each either a point `[x, y]` or box `[x_min, y_min, x_max, y_max]` with coordinates normalized to `[0, 1]` |
 | reasoning | boolean | no | Enable extended reasoning (default: false) |
 | settings | object | no | Generation settings |
 
@@ -222,7 +222,7 @@ Generate rollouts for a training or evaluation request.
 | max_tokens | integer | 128 | Maximum output length (query only) |
 | max_objects | integer | 50 | Maximum returned points or objects (point and detect only) |
 
-For `point` and `detect`, the output token budget is derived from `max_objects`. Public requests do not accept `max_tokens` for those skills.
+For `point` and `detect`, the output token budget is derived from `max_objects`. Requests to this finetuning API do not accept `max_tokens` for those skills; use `max_objects` instead.
 
 ### Ground truth
 
@@ -318,6 +318,8 @@ Pass these fields back unchanged when sending RL rollouts to `POST /train_step`.
 }
 ```
 
+`reasoning` is only present when `request.reasoning=true`; otherwise it is omitted or `null`.
+
 **Point**:
 
 ```json
@@ -404,11 +406,11 @@ Each group:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| mode | string | no | `"rl"` or `"sft"` |
+| mode | string | yes | Training mode, either `"rl"` or `"sft"` |
 | request | object | yes | Rollouts request for RL, or skill request for SFT |
-| rollouts | array | RL only | Rollout objects from `/rollouts` (pass unchanged) |
-| rewards | array | RL only | Reward for each rollout (same length and order) |
-| targets | array | SFT only | Target objects for supervised training |
+| rollouts | array | no | Required when `mode="rl"`; rollout objects from `/rollouts` (pass unchanged) |
+| rewards | array | no | Required when `mode="rl"`; reward for each rollout (same length and order) |
+| targets | array | no | Required when `mode="sft"`; target objects for supervised training |
 
 You can mix skills across groups in the same train step.
 
