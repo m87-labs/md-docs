@@ -128,7 +128,7 @@ Generate rollouts for a training or evaluation request.
 ```json
 {
   "finetune_id": "01HXYZ...",
-  "num_rollouts": 4,
+  "num_rollouts": 1,
   "request": { ... },
   "ground_truth": { ... }  // optional
 }
@@ -150,6 +150,7 @@ Generate rollouts for a training or evaluation request.
   "skill": "query",
   "question": "What color is the car?",
   "image_url": "data:image/jpeg;base64,...",  // optional
+  "spatial_refs": [[0.1, 0.1, 0.5, 0.5]],  // optional
   "reasoning": false,  // optional
   "settings": {
     "temperature": 1.0,
@@ -164,6 +165,7 @@ Generate rollouts for a training or evaluation request.
 | skill | string | yes | Must be `"query"` |
 | question | string | yes | The question to answer |
 | image_url | string | no | Base64 data URL of the image |
+| spatial_refs | array | no | Array of spatial references, each either a point `[x, y]` or box `[x_min, y_min, x_max, y_max]` with coordinates normalized to `[0, 1]` |
 | reasoning | boolean | no | Enable extended reasoning (default: false) |
 | settings | object | no | Generation settings |
 
@@ -177,7 +179,7 @@ Generate rollouts for a training or evaluation request.
   "settings": {
     "temperature": 1.0,
     "top_p": 1.0,
-    "max_tokens": 128
+    "max_objects": 50
   }
 }
 ```
@@ -199,8 +201,7 @@ Generate rollouts for a training or evaluation request.
   "settings": {
     "temperature": 1.0,
     "top_p": 1.0,
-    "max_tokens": 256,
-    "max_objects": 8
+    "max_objects": 50
   }
 }
 ```
@@ -218,8 +219,10 @@ Generate rollouts for a training or evaluation request.
 |-------|------|---------|-------------|
 | temperature | number | 1.0 | Controls randomness (0 = deterministic) |
 | top_p | number | 1.0 | Nucleus sampling threshold |
-| max_tokens | integer | 128 | Maximum output length |
-| max_objects | integer | — | Maximum objects to detect (detect only) |
+| max_tokens | integer | 128 | Maximum output length (query only) |
+| max_objects | integer | 50 | Maximum returned points or objects (point and detect only) |
+
+For `point` and `detect`, the output token budget is derived from `max_objects`. Requests to this finetuning API do not accept `max_tokens` for those skills; use `max_objects` instead.
 
 ### Ground truth
 
@@ -251,6 +254,10 @@ Generate rollouts for a training or evaluation request.
 
 All coordinates are normalized to 0–1.
 
+`ground_truth` is only supported for `point` and `detect` on `/rollouts`.
+
+For query SFT, use `POST /train_step` with `mode: "sft"` and `targets`.
+
 ### Response
 
 ```json
@@ -259,15 +266,20 @@ All coordinates are normalized to 0–1.
   "rollouts": [
     {
       "skill": "detect",
+      "finish_reason": "stop",
       "output": {
         "objects": [
           { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 }
         ]
       },
-      // ... opaque training metadata
+      "answer_tokens": [],
+      "thinking_tokens": [],
+      "has_answer_separator": false,
+      "coords": [],
+      "sizes": []
     }
   ],
-  "rewards": [0.8, 0.3, 0.6, 0.5]
+  "rewards": [0.8]
 }
 ```
 
@@ -277,6 +289,21 @@ All coordinates are normalized to 0–1.
 | rollouts | array | Generated rollouts |
 | rewards | array \| null | Computed rewards if ground truth was provided |
 
+Each rollout also includes the following training fields:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| skill | string | Skill for this rollout (`query`, `point`, or `detect`) |
+| finish_reason | string | Generation stop reason |
+| output | object | Skill output |
+| answer_tokens | array | Answer token IDs used for training |
+| thinking_tokens | array | Reasoning token IDs used for training |
+| has_answer_separator | boolean | Whether an answer separator token was used |
+| coords | array | Coordinate token data used for training |
+| sizes | array | Size token data used for training |
+
+Pass these fields back unchanged when sending RL rollouts to `POST /train_step`.
+
 ### Rollout output by skill
 
 **Query**:
@@ -284,9 +311,14 @@ All coordinates are normalized to 0–1.
 ```json
 {
   "answer": "The car is red.",
-  "reasoning": null  // present if reasoning was enabled
+  "reasoning": {
+    "text": "The car body appears red.",
+    "grounding": []
+  }
 }
 ```
+
+`reasoning` is only present when `request.reasoning=true`; otherwise it is omitted or `null`.
 
 **Point**:
 
@@ -310,7 +342,7 @@ All coordinates are normalized to 0–1.
 
 ## POST /train_step
 
-Apply one training step using scored rollouts.
+Apply one training step using RL or SFT.
 
 ### Request
 
@@ -319,6 +351,7 @@ Apply one training step using scored rollouts.
   "finetune_id": "01HXYZ...",
   "groups": [
     {
+      "mode": "rl",
       "request": { ... },
       "rollouts": [ ... ],
       "rewards": [0.8, 0.3, 0.6, 0.5]
@@ -334,21 +367,202 @@ Apply one training step using scored rollouts.
 | groups | array | yes | List of training groups |
 | lr | number | no | Learning rate (default: 0.002) |
 
+**RL group**
+
+```json
+{
+  "mode": "rl",
+  "request": { ... },
+  "rollouts": [ ... ],
+  "rewards": [0.8, 0.3, 0.6, 0.5]
+}
+```
+
+**SFT group**
+
+```json
+{
+  "mode": "sft",
+  "request": {
+    "skill": "query",
+    "question": "What country is this?",
+    "image_url": "data:image/jpeg;base64,...",
+    "reasoning": false,
+    "settings": {
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "max_tokens": 16
+    }
+  },
+  "targets": [
+    {
+      "answer": "United States"
+    }
+  ]
+}
+```
+
 Each group:
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| request | object | yes | The echoed request from /rollouts response |
-| rollouts | array | yes | The rollout objects from /rollouts response (pass unchanged) |
-| rewards | array | yes | Reward for each rollout (same length and order) |
+| mode | string | yes | Training mode, either `"rl"` or `"sft"` |
+| request | object | yes | Rollouts request for RL, or skill request for SFT |
+| rollouts | array | no | Required when `mode="rl"`; rollout objects from `/rollouts` (pass unchanged) |
+| rewards | array | no | Required when `mode="rl"`; reward for each rollout (same length and order) |
+| targets | array | no | Required when `mode="sft"`; target objects for supervised training |
 
 You can mix skills across groups in the same train step.
+
+For query SFT:
+- `targets` entries use `answer`
+- `reasoning` is required when `request.reasoning=true`
+- omit `reasoning` when `request.reasoning=false`
+
+For point SFT:
+- each target must include either `points` or `boxes`
+
+For detect SFT:
+- each target must include `boxes`
 
 ### Response
 
 ```json
-{}
+{
+  "step": 101,
+  "applied": true,
+  "kl": 0.12,
+  "router_kl": 0.03,
+  "grad_norm": 2.5,
+  "reward_mean": 0.58,
+  "reward_std": 0.19
+}
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| step | integer | Training step after this request |
+| applied | boolean | Whether the step was applied |
+| kl | number \| null | RL KL term |
+| router_kl | number \| null | Router KL regularizer |
+| grad_norm | number \| null | Gradient norm for the step |
+| sft_loss | number \| null | SFT loss when SFT groups are included |
+| reward_mean | number \| null | Mean reward across RL groups |
+| reward_std | number \| null | Reward standard deviation across RL rollouts |
+
+---
+
+## POST /finetunes/:finetuneId/metrics
+
+Log user-defined metrics for a specific training step, such as eval scores.
+
+### Request
+
+```json
+{
+  "step": 100,
+  "metrics": {
+    "eval/country_match": 0.63,
+    "eval/token_f1": 0.64
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| step | integer | yes | Training step the metrics belong to |
+| metrics | object | yes | Metric name to numeric value map |
+
+### Constraints
+
+- Include between 1 and 100 metrics per request.
+- Metric names must match `[A-Za-z0-9_/-]+`.
+- Do not include `sys/` or `usr/` prefixes in metric names.
+- Metric values must be finite numbers.
+
+### Response
+
+```json
+{
+  "ok": true,
+  "step": 100,
+  "logged_count": 2
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| ok | boolean | Whether the metrics were accepted |
+| step | integer | Training step the metrics were logged for |
+| logged_count | integer | Number of metric entries logged |
+
+---
+
+## GET /finetunes/:finetuneId/train_logs
+
+List recorded train log files for a finetune.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| limit | integer | 20 | Maximum results per page (1–100) |
+| cursor | string | — | Pagination cursor from the previous response |
+
+### Response
+
+```json
+{
+  "steps": [
+    {
+      "id": "000000123-rl=4-sft=8.json",
+      "step": 123,
+      "metadata": {
+        "rl": "4",
+        "sft": "8"
+      }
+    }
+  ],
+  "next_cursor": "000000123-rl=4-sft=8.json",
+  "has_more": true
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| steps | array | Train log summaries |
+| next_cursor | string \| null | Cursor for the next page |
+| has_more | boolean | Whether more results are available |
+
+Each `steps` entry includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Train log file ID |
+| step | integer | Training step number |
+| metadata | object | Metadata parsed from the train log file name |
+
+Results are returned in reverse chronological order.
+
+---
+
+## GET /finetunes/:finetuneId/train_logs/:step
+
+Get the raw JSON train log for a specific train log file ID.
+
+Use the `id` returned by `GET /finetunes/:finetuneId/train_logs`, for example:
+
+```
+000000123-rl=4-sft=8.json
+```
+
+### Response
+
+Returns the stored JSON train log body.
+
+**Constraints:**
+- Returns 400 if `:step` is not a valid train log file ID.
+- Returns 404 if the finetune or train log does not exist.
 
 ---
 
@@ -434,6 +648,30 @@ Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
 - Returns 410 if the checkpoint was already deleted.
 
 Deleting the latest checkpoint will prevent resuming training for that finetune.
+
+---
+
+## GET /finetunes/:finetuneId/checkpoints/:step/download
+
+Get a presigned URL for downloading a saved checkpoint.
+
+### Response
+
+```json
+{
+  "url": "https://...",
+  "expires_in": 3600
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| url | string | Presigned download URL |
+| expires_in | integer | URL lifetime in seconds |
+
+**Constraints:**
+- Returns 404 if the finetune or checkpoint does not exist.
+- Returns 410 if the checkpoint has expired or been deleted.
 
 ---
 
