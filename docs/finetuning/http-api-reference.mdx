@@ -179,7 +179,7 @@ Generate rollouts for a training or evaluation request.
   "settings": {
     "temperature": 1.0,
     "top_p": 1.0,
-    "max_tokens": 128
+    "max_objects": 50
   }
 }
 ```
@@ -201,8 +201,7 @@ Generate rollouts for a training or evaluation request.
   "settings": {
     "temperature": 1.0,
     "top_p": 1.0,
-    "max_tokens": 256,
-    "max_objects": 8
+    "max_objects": 50
   }
 }
 ```
@@ -220,8 +219,10 @@ Generate rollouts for a training or evaluation request.
 |-------|------|---------|-------------|
 | temperature | number | 1.0 | Controls randomness (0 = deterministic) |
 | top_p | number | 1.0 | Nucleus sampling threshold |
-| max_tokens | integer | 128 | Maximum output length |
-| max_objects | integer | — | Maximum objects to detect (detect only) |
+| max_tokens | integer | 128 | Maximum output length (query only) |
+| max_objects | integer | 50 | Maximum returned points or objects (point and detect only) |
+
+For `point` and `detect`, the output token budget is derived from `max_objects`. Public requests do not accept `max_tokens` for those skills.
 
 ### Ground truth
 
