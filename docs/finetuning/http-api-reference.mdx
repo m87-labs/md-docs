@@ -452,6 +452,120 @@ For detect SFT:
 
 ---
 
+## POST /finetunes/:finetuneId/metrics
+
+Log user-defined metrics for a specific training step, such as eval scores.
+
+### Request
+
+```json
+{
+  "step": 100,
+  "metrics": {
+    "eval/country_match": 0.63,
+    "eval/token_f1": 0.64
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| step | integer | yes | Training step the metrics belong to |
+| metrics | object | yes | Metric name to numeric value map |
+
+### Constraints
+
+- Include between 1 and 100 metrics per request.
+- Metric names must match `[A-Za-z0-9_/-]+`.
+- Do not include `sys/` or `usr/` prefixes in metric names.
+- Metric values must be finite numbers.
+
+### Response
+
+```json
+{
+  "ok": true,
+  "step": 100,
+  "logged_count": 2
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| ok | boolean | Whether the metrics were accepted |
+| step | integer | Training step the metrics were logged for |
+| logged_count | integer | Number of metric entries logged |
+
+---
+
+## GET /finetunes/:finetuneId/train_logs
+
+List recorded train log files for a finetune.
+
+### Query parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| limit | integer | 20 | Maximum results per page (1–100) |
+| cursor | string | — | Pagination cursor from the previous response |
+
+### Response
+
+```json
+{
+  "steps": [
+    {
+      "id": "000000123-rl=4-sft=8.json",
+      "step": 123,
+      "metadata": {
+        "rl": "4",
+        "sft": "8"
+      }
+    }
+  ],
+  "next_cursor": "000000123-rl=4-sft=8.json",
+  "has_more": true
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| steps | array | Train log summaries |
+| next_cursor | string \| null | Cursor for the next page |
+| has_more | boolean | Whether more results are available |
+
+Each `steps` entry includes:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Train log file ID |
+| step | integer | Training step number |
+| metadata | object | Metadata parsed from the train log file name |
+
+Results are returned in reverse chronological order.
+
+---
+
+## GET /finetunes/:finetuneId/train_logs/:step
+
+Get the raw JSON train log for a specific train log file ID.
+
+Use the `id` returned by `GET /finetunes/:finetuneId/train_logs`, for example:
+
+```
+000000123-rl=4-sft=8.json
+```
+
+### Response
+
+Returns the stored JSON train log body.
+
+**Constraints:**
+- Returns 400 if `:step` is not a valid train log file ID.
+- Returns 404 if the finetune or train log does not exist.
+
+---
+
 ## GET /finetunes/:finetuneId/checkpoints
 
 List saved checkpoints for a finetune.
