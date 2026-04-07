@@ -35,7 +35,7 @@ Create a new finetune.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | name | string | yes | Unique name for this finetune (alphanumeric, dots, hyphens, underscores) |
-| rank | integer | yes | LoRA rank: 8, 16, 24, or 32 (must be multiple of 8; higher = more capacity, but slower training) |
+| rank | integer | yes | LoRA rank: 8, 16, 24, or 32 (higher = more capacity, but slower training) |
 
 ### Response
 
@@ -61,7 +61,7 @@ List all finetunes for your organization.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| limit | integer | 50 | Maximum results per page (1–100) |
+| limit | integer | 20 | Maximum results per page (1–100) |
 | cursor | string | — | Pagination cursor from previous response |
 
 ### Response
@@ -223,7 +223,7 @@ Generate rollouts for a training or evaluation request.
 | temperature | number | 1.0 | Controls randomness (0 = deterministic) |
 | top_p | number | 1.0 | Nucleus sampling threshold |
 | max_tokens | integer | 128 for query/point, 256 for detect | Maximum output length |
-| max_objects | integer | 50 | Maximum objects to detect (detect only) |
+| max_objects | integer | — | Maximum objects to detect (detect only) |
 
 ### Ground truth
 
@@ -541,7 +541,7 @@ List saved checkpoints for a finetune.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| limit | integer | 50 | Maximum results per page (1–100) |
+| limit | integer | 20 | Maximum results per page (1–100) |
 | cursor | string | — | Pagination cursor from previous response |
 
 ### Response
@@ -612,7 +612,7 @@ Delete a saved checkpoint. The checkpoint will be cleaned up shortly.
 
 **Constraints:**
 - Returns 404 if the checkpoint does not exist.
-- Returns 410 if the checkpoint was already deleted.
+- Idempotent: deleting an already-deleted checkpoint returns success.
 
 Deleting the latest checkpoint will prevent resuming training for that finetune.
 
