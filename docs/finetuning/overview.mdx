@@ -1,0 +1,85 @@
+---
+title: "Overview"
+slug: /finetuning
+sidebar_position: 1
+---
+
+# Finetuning
+
+Finetuning lets you customize Moondream for your specific use case, training it to be better at exactly what you need. Training runs entirely in Moondream Cloud — no GPU required on your end.
+
+## Training modes
+
+**RL (reinforcement learning)** — the model generates multiple attempts, you score them, and it learns to produce more of what scores well.
+
+**SFT (supervised finetuning)** — you provide correct answers directly, and the model learns to reproduce them.
+
+**Start with RL in most cases.** It's more sample-efficient, handles ambiguity naturally, and lets you encode exactly what "good" means for your use case.
+
+**Consider SFT when** you have high-quality unambiguous labels with a single correct answer per input, or when the model can't yet perform the task well enough for RL to work — use SFT to bootstrap, then switch to RL to refine.
+
+You can combine both modes in the same training step.
+
+| Aspect | RL | SFT |
+|--------|-----|-----|
+| What you provide | Scoring function | Correct answers |
+| Best when | Labels are fuzzy, expensive, or ambiguous | You have exact labels |
+| Multiple valid outputs | Handles naturally | Requires a single correct answer |
+| Sample efficiency | Higher | Lower |
+
+## When to use RL finetuning
+
+RL finetuning shines when:
+
+- **You can recognize good output easier than you can write it.** You know a good product description when you see one, but writing perfect examples for every case is impractical.
+
+- **Multiple answers are acceptable.** "The red car" and "a red vehicle on the left" are both correct. This also applies to spatial outputs like bounding boxes and points, where order doesn't matter.
+
+- **You want to encode preferences.** Maybe you want the model to be more conservative, more detailed, or to prioritize certain types of objects.
+
+- **You have limited training data.** RL is more sample-efficient — it extracts more signal from each example by generating and scoring multiple attempts.
+
+| Task | Why RL works well |
+|------|-------------------|
+| Medical image questions | Multiple valid phrasings; domain expert scores accuracy |
+| Manufacturing defect pointing | "Correct" depends on context — ignore minor scratches, focus on cracks |
+| Security footage detection | Tune precision/recall tradeoff for your needs |
+| Product descriptions | Many good descriptions exist; easier to rate than write |
+
+### The model needs a starting point
+
+RL works best when the model can already *somewhat* perform the task — it reinforces existing good behaviors. If the model can't do the task at all, start with SFT to teach the basics, then switch to RL.
+
+## Supported skills
+
+| Skill | What it does | Output | Example |
+|-------|-------------|--------|---------|
+| **query** | Answer questions about images | Text | "What brand is this product?" |
+| **point** | Locate objects in an image | x, y coordinates | "Point to the defects" |
+| **detect** | Locate objects in an image | Bounding boxes | "Detect all vehicles" |
+
+## Key concepts
+
+| Term | Meaning |
+|------|---------|
+| **Rollout** | One output attempt from the model |
+| **Reward** | A score you assign to a rollout (higher = better) |
+| **Finetune** | Finetuned weights layered on top of the base model via LoRA. Identified by a unique `finetune_id`. |
+| **Checkpoint** | A saved model state at a specific training step. Only saved checkpoints can be used for inference. |
+| **Train step** | One update to the model based on scored rollouts or supervised targets |
+
+## Architecture
+
+| Your code | Moondream Cloud |
+|-----------|-----------------|
+| Provides training data | Generates model outputs |
+| Scores outputs (RL) or provides targets (SFT) | Applies training updates |
+| Orchestrates training loop | Manages checkpoints |
+
+Your orchestration code runs anywhere — no GPU required.
+
+## Next steps
+
+- **[Quickstart](/finetuning/quickstart)** — Train a model end-to-end in Python
+- **[Python SDK](/finetuning/python-sdk)** — Full SDK reference
+- **[HTTP API reference](/finetuning/http-api-reference)** — Wire format for all endpoints

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 title: "HTTP API reference"
 ---
 
@@ -34,7 +34,7 @@ Create a new finetune.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| name | string | yes | Unique name for this finetune (alphanumeric, hyphens, underscores) |
+| name | string | yes | Unique name for this finetune (alphanumeric, dots, hyphens, underscores) |
 | rank | integer | yes | LoRA rank: 8, 16, 24, or 32 (must be multiple of 8; higher = more capacity, but slower training) |
 
 ### Response
@@ -223,7 +223,7 @@ Generate rollouts for a training or evaluation request.
 | temperature | number | 1.0 | Controls randomness (0 = deterministic) |
 | top_p | number | 1.0 | Nucleus sampling threshold |
 | max_tokens | integer | 128 for query/point, 256 for detect | Maximum output length |
-| max_objects | integer | — | Maximum objects to detect (detect only) |
+| max_objects | integer | 50 | Maximum objects to detect (detect only) |
 
 ### Ground truth
 
@@ -388,14 +388,11 @@ Apply one training step using RL or SFT.
   "request": {
     "skill": "query",
     "question": "What country is this?",
-    "image_url": "data:image/jpeg;base64,...",
-    "reasoning": false
+    "image_url": "data:image/jpeg;base64,..."
   },
-  "targets": [
-    {
-      "answer": "United States"
-    }
-  ]
+  "target": {
+    "answer": "United States"
+  }
 }
 ```
 
@@ -407,74 +404,66 @@ Each group:
 | request | object | yes | For RL, the full request body previously sent to `POST /rollouts`; for SFT, the skill request |
 | rollouts | array | no | Required when `mode="rl"`; rollout objects from `/rollouts` (pass unchanged) |
 | rewards | array | no | Required when `mode="rl"`; reward for each rollout (same length and order) |
-| targets | array | no | Required when `mode="sft"`; target objects for supervised training |
+| target | object | no | Required when `mode="sft"`; target for supervised training |
 
 You can mix skills across groups in the same train step.
 
-### Targets
+### Target
 
-| Skill | Type | Required | Description |
-|-------|------|----------|-------------|
-| `query` | object | `answer` | `reasoning` is required when `request.reasoning=true`; omit it when `request.reasoning=false` |
-| `point` | object | `points` or `boxes` | Include exactly one of `points` or `boxes` |
-| `detect` | object | `boxes` | One or more target boxes |
+| Skill | Required fields | Description |
+|-------|----------------|-------------|
+| `query` | `answer` | `reasoning` is required when `request.reasoning=true`; omit when `request.reasoning=false` |
+| `point` | `points` or `boxes` | Exactly one of `points` or `boxes` |
+| `detect` | `boxes` | One or more target boxes |
 
 **Query**
 
 ```json
-[
-  {
-    "answer": "United States"
-  }
-]
+{
+  "answer": "United States"
+}
 ```
 
 If `request.reasoning=true`, include `reasoning`:
 
 ```json
-[
-  {
-    "answer": "United States",
-    "reasoning": "The road markings and signs match the US."
+{
+  "answer": "United States",
+  "reasoning": {
+    "text": "The road markings and signs match the US."
   }
-]
+}
 ```
 
 **Point**
 
 ```json
-[
-  {
-    "points": [
-      { "x": 0.52, "y": 0.31 }
-    ]
-  }
-]
+{
+  "points": [
+    { "x": 0.52, "y": 0.31 }
+  ]
+}
 ```
 
 Point targets can also use `boxes`:
 
 ```json
-[
-  {
-    "boxes": [
-      { "x_min": 0.45, "y_min": 0.22, "x_max": 0.58, "y_max": 0.39 }
-    ]
-  }
-]
+{
+  "boxes": [
+    { "x_min": 0.45, "y_min": 0.22, "x_max": 0.58, "y_max": 0.39 }
+  ]
+}
 ```
 
 **Detect**
 
 ```json
-[
-  {
-    "boxes": [
-      { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 },
-      { "x_min": 0.51, "y_min": 0.18, "x_max": 0.74, "y_max": 0.49 }
-    ]
-  }
-]
+{
+  "boxes": [
+    { "x_min": 0.12, "y_min": 0.22, "x_max": 0.39, "y_max": 0.58 },
+    { "x_min": 0.51, "y_min": 0.18, "x_max": 0.74, "y_max": 0.49 }
+  ]
+}
 ```
 
 ### Response
@@ -484,6 +473,8 @@ Point targets can also use `boxes`:
   "step": 101,
   "applied": true,
   "kl": 0.12,
+  "router_kl": 0.004,
+  "grad_norm": 1.42,
   "reward_mean": 0.58,
   "reward_std": 0.19,
   "sft_loss": 1.23
@@ -494,12 +485,51 @@ Point targets can also use `boxes`:
 |-------|------|-------------|
 | step | integer | Training step after this request |
 | applied | boolean | Whether the step was applied |
-| kl | number \| null | RL KL term |
+| kl | number \| null | RL KL divergence |
+| router_kl | number \| null | Router KL divergence |
+| grad_norm | number \| null | Gradient norm |
 | reward_mean | number \| null | Mean reward across RL groups |
 | reward_std | number \| null | Reward standard deviation across RL rollouts |
 | sft_loss | number \| null | SFT loss when SFT groups are included |
 
-Additional training metrics may also be returned.
+---
+
+## POST /finetunes/:finetuneId/metrics
+
+Log custom metrics for a training step.
+
+### Request
+
+```json
+{
+  "step": 100,
+  "metrics": {
+    "eval/accuracy": 0.85,
+    "eval/f1": 0.82
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| step | integer | yes | Training step number |
+| metrics | object | yes | Metric name to value mapping |
+
+### Response
+
+```json
+{
+  "ok": true,
+  "step": 100,
+  "logged_count": 2
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| ok | boolean | Whether the metrics were logged |
+| step | integer | The step number |
+| logged_count | integer | Number of metrics logged |
 
 ---
 

@@ -1,0 +1,179 @@
+---
+title: "Quickstart"
+sidebar_position: 2
+---
+
+# Quickstart
+
+Train Moondream to classify rock, paper, and scissors images using RL finetuning.
+
+## Prerequisites
+
+```bash
+pip install moondream datasets pillow
+```
+
+Get an API key from the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys).
+
+## Setup
+
+```python
+import os
+import time
+from itertools import cycle
+
+from datasets import load_dataset
+import moondream as md
+
+QUESTION = "Is this rock, paper, or scissors? Respond with rock, paper, or scissors only."
+```
+
+## Load the dataset
+
+```python
+train_data = load_dataset("moondream/rps-finetune", split="train")
+eval_data = load_dataset("moondream/rps-finetune", split="valid")
+```
+
+## Create a finetune
+
+```python
+ft = md.ft(
+    api_key=os.environ["MOONDREAM_API_KEY"],
+    name=f"rps-query-{int(time.time())}",
+    rank=8,
+)
+print(f"Created finetune: {ft.finetune_id}")
+```
+
+`rank` controls the LoRA rank (8, 16, 24, or 32). Higher values give more capacity but train slower.
+
+## Train
+
+Each training step: generate rollouts, score them, update the model.
+
+```python
+train_iter = cycle(train_data)
+
+for i in range(20):
+    example = next(train_iter)
+
+    # Generate 4 rollouts
+    response = ft.rollouts(
+        "query",
+        image=example["image"],
+        question=QUESTION,
+        num_rollouts=4,
+        settings={"temperature": 1.0, "max_tokens": 4},
+    )
+
+    # Score: 1.0 if correct, 0.0 if not
+    rewards = [
+        float(r["output"]["answer"].strip().lower() == example["class"])
+        for r in response["rollouts"]
+    ]
+
+    # Train
+    step = ft.train_step([{
+        "mode": "rl",
+        "request": response["request"],
+        "rollouts": response["rollouts"],
+        "rewards": rewards,
+    }], lr=0.001)
+
+    print(f"step={step['step']} reward={sum(rewards)/len(rewards):.2f}")
+```
+
+Pass `response["request"]` and `response["rollouts"]` back unchanged — they contain metadata needed for training.
+
+## Speeding up training with rollout_stream
+
+The loop above waits for each rollout request to finish before starting the next one. In practice, rollout generation is the bottleneck — `rollout_stream` runs rollout requests in background threads so the next batch is already generating while you train on the current one.
+
+Here's the same training loop rewritten with `rollout_stream`:
+
+```python
+requests = (
+    (example, {
+        "skill": "query",
+        "image": example["image"],
+        "question": QUESTION,
+        "num_rollouts": 4,
+        "settings": {"temperature": 1.0, "max_tokens": 4},
+    })
+    for example in cycle(train_data)
+)
+
+for _, (example, response) in zip(range(20), ft.rollout_stream(requests)):
+    rewards = [
+        float(r["output"]["answer"].strip().lower() == example["class"])
+        for r in response["rollouts"]
+    ]
+
+    step = ft.train_step([{
+        "mode": "rl",
+        "request": response["request"],
+        "rollouts": response["rollouts"],
+        "rewards": rewards,
+    }], lr=0.001)
+
+    print(f"step={step['step']} reward={sum(rewards)/len(rewards):.2f}")
+```
+
+`rollout_stream` takes an iterable of `(context, rollout_kwargs)` tuples and yields `(context, response)` tuples. The context (here, the training example) is passed through so you can pair each response with its ground-truth label for scoring.
+
+By default it runs 4 requests concurrently. See the [Python SDK reference](/finetuning/python-sdk#ftrollout_stream) for the full parameter list.
+
+## Evaluate
+
+Use `temperature=0` for deterministic output:
+
+```python
+eval_samples = eval_data.select(range(20))
+
+correct = 0
+for ex in eval_samples:
+    result = ft.rollouts(
+        "query",
+        image=ex["image"],
+        question=QUESTION,
+        settings={"temperature": 0.0, "max_tokens": 4},
+    )
+    answer = result["rollouts"][0]["output"]["answer"].strip().lower()
+    correct += answer == ex["class"]
+
+accuracy = correct / len(eval_samples)
+print(f"Accuracy: {accuracy:.1%}")
+
+ft.log_metrics(step["step"], {"eval/accuracy": accuracy})
+```
+
+## Save and deploy
+
+Save a checkpoint to make it available for inference:
+
+```python
+checkpoint = ft.save_checkpoint()["checkpoint"]
+model_id = ft.model(checkpoint["step"])
+print(f"Model ID: {model_id}")
+```
+
+Use the model ID with any inference endpoint:
+
+```bash
+curl -X POST https://api.moondream.ai/v1/query \
+  -H "X-Moondream-Auth: $MOONDREAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "MODEL_ID",
+    "image_url": "data:image/jpeg;base64,...",
+    "question": "Is this rock, paper, or scissors?"
+  }'
+```
+
+Replace `MODEL_ID` with the value printed above (e.g. `moondream3-preview/01HXYZ...@20`).
+
+## Next steps
+
+- **[Python SDK](/finetuning/python-sdk)** — All SDK methods, SFT training, concurrent rollouts, and more
+- **[HTTP API reference](/finetuning/http-api-reference)** — Wire format for all endpoints

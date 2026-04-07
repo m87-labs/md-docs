@@ -1,0 +1,384 @@
+---
+title: "Python SDK"
+sidebar_position: 3
+---
+
+# Python SDK
+
+```bash
+pip install moondream
+```
+
+## Creating a finetune
+
+### New finetune
+
+```python
+import moondream as md
+
+ft = md.ft(
+    api_key="your-api-key",
+    name="my-finetune",
+    rank=8,
+)
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| api_key | str | yes | Moondream API key |
+| name | str | yes* | Unique name (alphanumeric, dots, hyphens, underscores) |
+| rank | int | yes* | LoRA rank: 8, 16, 24, or 32 |
+| endpoint | str | no | API endpoint (default: `https://api.moondream.ai/v1/tuning`) |
+
+*Required when creating a new finetune.
+
+If a finetune with the same name and rank already exists, the existing one is returned. If the name exists with a different rank, the server returns 409 Conflict.
+
+### Existing finetune
+
+```python
+ft = md.ft(
+    api_key="your-api-key",
+    finetune_id="01HXYZ...",
+)
+```
+
+Cannot combine `finetune_id` with `name` or `rank`.
+
+### Properties
+
+```python
+ft.finetune_id  # "01HXYZ..."
+ft.name         # "my-finetune"
+ft.rank         # 8
+```
+
+## Generating rollouts
+
+### ft.rollouts()
+
+Generate rollouts for a single request.
+
+```python
+response = ft.rollouts(
+    "query",
+    image=pil_image,
+    question="What color is the car?",
+    num_rollouts=4,
+    settings={"temperature": 1.0, "max_tokens": 128},
+)
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| skill | str | yes | `"query"`, `"point"`, or `"detect"` |
+| image | PIL.Image or EncodedImage | depends | Required for point/detect, optional for query |
+| question | str | depends | Required for query |
+| object | str | depends | Required for point/detect |
+| num_rollouts | int | no | Number of attempts, 1–16 (default: 1) |
+| settings | dict | no | Sampling settings (see [Settings](#settings)) |
+| reasoning | bool | no | Enable reasoning (default: false, query only) |
+| spatial_refs | list | no | Spatial references as `[x, y]` or `[x_min, y_min, x_max, y_max]` (query only) |
+| ground_truth | dict | no | For automatic reward computation (point/detect only, see [Ground truth](#ground-truth)) |
+
+Returns a dict:
+
+```python
+{
+    "request": { ... },      # Pass back to train_step unchanged
+    "rollouts": [
+        {
+            "skill": "query",
+            "output": {"answer": "red"},
+            ...                # Opaque training metadata
+        }
+    ],
+    "rewards": [0.8, ...]    # Present if ground_truth was provided, otherwise null
+}
+```
+
+**Rollout output by skill:**
+
+| Skill | Output |
+|-------|--------|
+| query | `{"answer": "...", "reasoning": {...}}` (reasoning only if enabled) |
+| point | `{"points": [{"x": 0.52, "y": 0.31}, ...]}` |
+| detect | `{"objects": [{"x_min": 0.1, "y_min": 0.2, "x_max": 0.4, "y_max": 0.6}, ...]}` |
+
+### ft.rollout_stream()
+
+Generate rollouts concurrently in background threads, yielding results as they complete. This overlaps rollout generation with training — while you process one result, the next batch is already in flight.
+
+```python
+requests = (
+    (example, {
+        "skill": "query",
+        "image": example["image"],
+        "question": "What is this?",
+        "num_rollouts": 4,
+        "settings": {"temperature": 1.0},
+    })
+    for example in training_data
+)
+
+for context, response in ft.rollout_stream(requests):
+    rewards = compute_rewards(context, response)
+    ft.train_step([{
+        "mode": "rl",
+        "request": response["request"],
+        "rollouts": response["rollouts"],
+        "rewards": rewards,
+    }])
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| requests | iterable | required | Iterable of `(context, kwargs_dict)` tuples |
+| max_concurrency | int | 4 | Maximum parallel requests |
+| buffer_size | int | 8 | Maximum buffered results |
+
+Each `kwargs_dict` is unpacked as `**kwargs` to `ft.rollouts()`. The `context` is passed through untouched so you can pair responses with ground-truth labels.
+
+Results are in **completion order**, not submission order.
+
+## Training
+
+### ft.train_step()
+
+Apply one training step.
+
+```python
+step = ft.train_step(groups, lr=0.002)
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| groups | list | required | RL and/or SFT group dicts |
+| lr | float | 0.002 | Learning rate |
+
+Returns:
+
+```python
+{
+    "step": 12,           # Training step number
+    "applied": True,      # Whether weights were updated
+    "kl": 0.031,          # KL divergence (RL)
+    "router_kl": 0.004,   # Router KL divergence
+    "grad_norm": 1.42,    # Gradient norm
+    "reward_mean": 0.75,  # Mean reward (RL)
+    "reward_std": 0.18,   # Reward std dev (RL)
+    "sft_loss": None,     # SFT loss (SFT)
+}
+```
+
+### RL groups
+
+Pass rollout responses back with rewards:
+
+```python
+ft.train_step([{
+    "mode": "rl",
+    "request": response["request"],
+    "rollouts": response["rollouts"],
+    "rewards": [0.8, 0.3, 0.6, 0.5],
+}])
+```
+
+- Pass `request` and `rollouts` back unchanged from the rollouts response
+- `rewards` must match the length and order of `rollouts`
+
+### SFT groups
+
+Provide the correct answer directly. The request is a skill request dict, not a rollouts response.
+
+**Query:**
+
+```python
+ft.train_step([{
+    "mode": "sft",
+    "request": {
+        "skill": "query",
+        "image": pil_image,
+        "question": "What country is this?",
+    },
+    "target": {"answer": "United States"},
+}])
+```
+
+With reasoning enabled:
+
+```python
+ft.train_step([{
+    "mode": "sft",
+    "request": {
+        "skill": "query",
+        "image": pil_image,
+        "question": "What country is this?",
+        "reasoning": True,
+    },
+    "target": {
+        "answer": "United States",
+        "reasoning": {"text": "The road markings and signs match the US."},
+    },
+}])
+```
+
+**Point:**
+
+```python
+ft.train_step([{
+    "mode": "sft",
+    "request": {
+        "skill": "point",
+        "image": pil_image,
+        "object": "the red button",
+    },
+    "target": {"points": [{"x": 0.52, "y": 0.31}]},
+}])
+```
+
+Point targets can also use bounding boxes:
+
+```python
+"target": {"boxes": [{"x_min": 0.45, "y_min": 0.22, "x_max": 0.58, "y_max": 0.39}]}
+```
+
+**Detect:**
+
+```python
+ft.train_step([{
+    "mode": "sft",
+    "request": {
+        "skill": "detect",
+        "image": pil_image,
+        "object": "vehicles",
+    },
+    "target": {"boxes": [
+        {"x_min": 0.10, "y_min": 0.20, "x_max": 0.40, "y_max": 0.60},
+    ]},
+}])
+```
+
+You can mix RL and SFT groups and different skills in the same `train_step` call. PIL images in SFT requests are encoded automatically.
+
+## Metrics
+
+### ft.log_metrics()
+
+Log custom metrics for a training step:
+
+```python
+result = ft.log_metrics(
+    step=step["step"],
+    metrics={"eval/accuracy": 0.85, "eval/f1": 0.82},
+)
+# {"ok": True, "step": 12, "logged_count": 2}
+```
+
+## Checkpoints
+
+### ft.save_checkpoint()
+
+Save the current checkpoint. Only saved checkpoints can be used for inference.
+
+```python
+result = ft.save_checkpoint()
+checkpoint = result["checkpoint"]
+# {"checkpoint_id": "01JXYZ...", "finetune_id": "01HXYZ...", "step": 100, ...}
+```
+
+### ft.list_checkpoints()
+
+```python
+result = ft.list_checkpoints(limit=50, cursor=None)
+for cp in result["checkpoints"]:
+    print(f"step={cp['step']} id={cp['checkpoint_id']}")
+# result["has_more"], result["next_cursor"] for pagination
+```
+
+### ft.delete_checkpoint()
+
+```python
+ft.delete_checkpoint(step=100)
+```
+
+Deleting the latest checkpoint prevents resuming training.
+
+## Inference
+
+### ft.model()
+
+Get the model ID for a saved checkpoint:
+
+```python
+model_id = ft.model(step=100)
+# "moondream3-preview/01HXYZ...@100"
+```
+
+Use this with the `model` parameter on any inference endpoint:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/v1/query` | Question answering |
+| `/v1/caption` | Image captioning |
+| `/v1/detect` | Object detection |
+| `/v1/point` | Point localization |
+| `/v1/batch` | Batch processing |
+
+Only saved checkpoints can be used for inference.
+
+## Cleanup
+
+### ft.delete()
+
+Delete the finetune and all its checkpoints:
+
+```python
+ft.delete()
+```
+
+## Settings
+
+Rollout requests accept a `settings` dict:
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| temperature | float | 1.0 | Randomness (0 = deterministic) |
+| top_p | float | 1.0 | Nucleus sampling threshold |
+| max_tokens | int | 128 (query/point), 256 (detect) | Maximum output length |
+| max_objects | int | 50 | Maximum detected objects (detect only) |
+
+All fields are optional.
+
+Use high temperature (e.g. 1.0) during training for diverse rollouts. Use `temperature=0` for evaluation.
+
+## Ground truth
+
+For point and detect skills, provide ground truth to have the server compute rewards automatically.
+
+### Point
+
+With coordinates:
+
+```python
+ft.rollouts("point", image=img, object="the button",
+            ground_truth={"points": [{"x": 0.52, "y": 0.31}]})
+```
+
+With bounding boxes (reward based on whether the predicted point falls inside):
+
+```python
+ft.rollouts("point", image=img, object="the button",
+            ground_truth={"boxes": [{"x_min": 0.1, "y_min": 0.2, "x_max": 0.4, "y_max": 0.6}]})
+```
+
+### Detect
+
+```python
+ft.rollouts("detect", image=img, object="vehicles",
+            ground_truth={"boxes": [
+                {"x_min": 0.1, "y_min": 0.2, "x_max": 0.4, "y_max": 0.6},
+            ]})
+```
+
+All coordinates are normalized to 0–1. Ground truth is not supported for query — compute rewards yourself.
