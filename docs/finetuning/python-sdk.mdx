@@ -290,7 +290,7 @@ checkpoint = result["checkpoint"]
 ### ft.list_checkpoints()
 
 ```python
-result = ft.list_checkpoints(limit=20, cursor=None)
+result = ft.list_checkpoints(limit=50, cursor=None)
 for cp in result["checkpoints"]:
     print(f"step={cp['step']} id={cp['checkpoint_id']}")
 # result["has_more"], result["next_cursor"] for pagination
@@ -346,7 +346,7 @@ Rollout requests accept a `settings` dict:
 | temperature | float | 1.0 | Randomness (0 = deterministic) |
 | top_p | float | 1.0 | Nucleus sampling threshold |
 | max_tokens | int | 128 (query/point), 256 (detect) | Maximum output length |
-| max_objects | int | — | Maximum detected objects (detect only) |
+| max_objects | int | 50 | Maximum detected objects (detect only) |
 
 All fields are optional.
 
