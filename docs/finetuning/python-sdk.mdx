@@ -148,13 +148,13 @@ Results are in **completion order**, not submission order.
 Apply one training step.
 
 ```python
-step = ft.train_step(groups, lr=0.002)
+step = ft.train_step(groups, lr=2e-4)
 ```
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | groups | list | required | RL and/or SFT group dicts |
-| lr | float | 0.002 | Learning rate |
+| lr | float | 2e-4 | Learning rate |
 
 Returns:
 

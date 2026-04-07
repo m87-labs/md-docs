@@ -79,7 +79,7 @@ for i in range(20):
         "request": response["request"],
         "rollouts": response["rollouts"],
         "rewards": rewards,
-    }], lr=0.001)
+    }], lr=2e-4)
 
     print(f"step={step['step']} reward={sum(rewards)/len(rewards):.2f}")
 ```
@@ -115,7 +115,7 @@ for _, (example, response) in zip(range(20), ft.rollout_stream(requests)):
         "request": response["request"],
         "rollouts": response["rollouts"],
         "rewards": rewards,
-    }], lr=0.001)
+    }], lr=2e-4)
 
     print(f"step={step['step']} reward={sum(rewards)/len(rewards):.2f}")
 ```
