@@ -14,7 +14,6 @@ Photon is Moondream's high-performance inference engine for running Moondream lo
 - **GPU**: NVIDIA GPU (Ampere or newer) — see [Supported GPUs](#supported-gpus) for the full list
 - **Python**: 3.10+
 - **API Key**: Get one from [moondream.ai](https://moondream.ai/c/cloud/api-keys)
-- **Model Access**: Moondream 3 requires [access approval](https://huggingface.co/moondream/moondream3-preview) (automatically granted), then authenticate with `huggingface-cli login` or set `HF_TOKEN`. Moondream 2 is public and requires no approval.
 
 ## Installation
 
@@ -71,8 +70,8 @@ model = md.vl(api_key="YOUR_API_KEY", local=True, model="moondream2")
 
 | Model | Repository | Notes |
 |-------|------------|-------|
-| Moondream 3 Preview | [moondream/moondream3-preview](https://huggingface.co/moondream/moondream3-preview) | Default. Requires access approval + `HF_TOKEN` |
-| Moondream 2 | [vikhyatk/moondream2](https://huggingface.co/vikhyatk/moondream2) | Public, no approval needed |
+| Moondream 3 Preview | [moondream/moondream3-preview](https://huggingface.co/moondream/moondream3-preview) | Default |
+| Moondream 2 | [vikhyatk/moondream2](https://huggingface.co/vikhyatk/moondream2) | |
 
 Model weights are automatically downloaded from Hugging Face on first run and cached locally.
 
@@ -92,7 +91,7 @@ for chunk in model.query(image, "Describe this scene in detail.", stream=True)["
 
 ## Using Finetunes
 
-If you've created a finetuned model through the [Moondream finetuning API](/finetuning/), you can use it locally with Photon:
+If you've created a finetuned model through the [Moondream finetuning API](/finetuning), you can use it locally with Photon:
 
 ```python
 model = md.vl(
@@ -144,7 +143,7 @@ Photon supports NVIDIA Jetson Orin (AGX Orin, Orin NX, Orin Nano) with JetPack 6
 ### Prerequisites
 
 - Jetson Orin with JetPack 6.x flashed
-- Python 3.10
+- Python 3.10 (required — NVIDIA's Jetson PyTorch wheels are cp310-only)
 - CUDA runtime (included with JetPack)
 
 ### Install PyTorch
@@ -195,10 +194,19 @@ python3 -c "import torch; print(torch.__version__); import moondream; print('moo
 
 Photon can be deployed as a [Triton Inference Server](https://github.com/triton-inference-server/server) backend for production serving.
 
+First, clone the [kestrel repo](https://github.com/m87-labs/kestrel) to get the Triton model repository:
+
+```bash
+git clone https://github.com/m87-labs/kestrel.git
+cd kestrel
+```
+
+Then launch Triton with the model repository mounted:
+
 ```bash
 docker run --gpus all --rm -it \
   -p 8000:8000 -p 8001:8001 -p 8002:8002 \
-  -v ./triton/model_repository:/models \
+  -v ./triton_server/model_repository:/models \
   -e MOONDREAM_API_KEY=your-api-key \
   -e KESTREL_MODEL=moondream3-preview \
   nvcr.io/nvidia/tritonserver:24.08-py3 \
@@ -210,7 +218,7 @@ To use a local model checkpoint instead of downloading:
 ```bash
 docker run --gpus all --rm -it \
   -p 8000:8000 -p 8001:8001 -p 8002:8002 \
-  -v ./triton/model_repository:/models \
+  -v ./triton_server/model_repository:/models \
   -v /path/to/model/weights:/model_weights \
   -e MOONDREAM_API_KEY=your-api-key \
   -e KESTREL_MODEL_PATH=/model_weights \
@@ -230,8 +238,6 @@ docker run --gpus all --rm -it \
 - gRPC: `localhost:8001`
 - Metrics: `http://localhost:8002`
 
-The model repository is available in the [kestrel repo](https://github.com/m87-labs/kestrel/tree/main/triton/model_repository).
-
 ## Performance
 
 Photon uses custom CUDA kernels and optimized scheduling to deliver high throughput. On an H100, Photon achieves over 60 requests/second for visual Q&A with Moondream 2 and over 58 requests/second with Moondream 3.
@@ -244,10 +250,7 @@ For detailed benchmarks across all supported GPUs, see [PERFORMANCE.md](https://
 |----------|-------------|
 | `MOONDREAM_API_KEY` | Required. Get from [moondream.ai](https://moondream.ai/c/cloud/api-keys). Can also be passed as `api_key` parameter. |
 | `HF_HOME` | Override Hugging Face cache directory for model weights (default: `~/.cache/huggingface`). |
-| `HF_TOKEN` | Hugging Face token for gated models like Moondream 3. Alternatively, run `huggingface-cli login`. |
 
----
-
-### Hugging Face Transformers
+## Hugging Face Transformers
 
 If you're running on non-NVIDIA hardware, Moondream can also be loaded via [Hugging Face Transformers](/transformers). On NVIDIA GPUs, Photon is strongly recommended — it delivers ~5x higher throughput and ~2.4x lower latency.
