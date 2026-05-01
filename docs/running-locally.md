@@ -2,18 +2,20 @@
 id: running-locally
 slug: running-locally
 title: Run Moondream Locally
-description: High-performance local inference with Photon on NVIDIA GPUs
+description: High-performance local inference with Photon on NVIDIA GPUs and Apple Silicon
 ---
 
 # Run Moondream Locally
 
-Photon is Moondream's high-performance inference engine for running Moondream locally on NVIDIA GPUs. It features custom CUDA kernels, automatic batching, paged KV caching, and prefix caching — the same engine that powers [Moondream Cloud](https://moondream.ai), now available for local and on-prem deployment.
+Photon is Moondream's high-performance inference engine for running Moondream locally — on NVIDIA GPUs (Linux x86_64 / aarch64 or Windows AMD64), or on Apple Silicon Macs with native Metal kernels. It features custom CUDA and Metal kernels, automatic batching, paged KV caching, and prefix caching — the same engine that powers [Moondream Cloud](https://moondream.ai), now available for local and on-prem deployment.
 
 ## Requirements
 
-- **GPU**: NVIDIA GPU (Ampere or newer) — see [Supported GPUs](#supported-gpus) for the full list
-- **Python**: 3.10+
-- **API Key**: Get one from [moondream.ai](https://moondream.ai/c/cloud/api-keys)
+- One of:
+  - **NVIDIA GPU** (Ampere or newer) on Linux x86_64 / aarch64 or Windows AMD64 — see [Supported Hardware](#supported-hardware) for the full list.
+  - **Apple Silicon Mac** (M-series) on macOS 13 (Ventura) or later, Python 3.12.
+- **Python**: 3.10+ on Linux / Windows; 3.12 on macOS.
+- **API Key**: Get one from [moondream.ai](https://moondream.ai/c/cloud/api-keys).
 
 ## Installation
 
@@ -29,7 +31,7 @@ This installs the Moondream Python client with built-in Photon support.
 import moondream as md
 from PIL import Image
 
-# Initialize with local GPU inference
+# Initialize with local inference (NVIDIA GPU or Apple Silicon)
 model = md.vl(api_key="YOUR_API_KEY", local=True)
 
 # Load an image
@@ -107,12 +109,13 @@ The model string format is `{base_model}/{finetune_id}@{step}` where:
 
 Adapters are automatically downloaded and cached on first use.
 
-## Supported GPUs
+## Supported Hardware
 
-### Server / Datacenter
+### NVIDIA — Server / Datacenter
 
 | GPU | VRAM | Architecture |
 |-----|------|--------------|
+| B200 | 192 GB | Blackwell (SM100) |
 | H200 | 141 GB | Hopper (SM90) |
 | H100 | 80 GB | Hopper (SM90) |
 | GH200 | 96 GB | Hopper (SM90) |
@@ -122,33 +125,90 @@ Adapters are automatically downloaded and cached on first use.
 | A10 | 24 GB | Ampere (SM86) |
 | L4 | 24 GB | Ada Lovelace (SM89) |
 
-### Desktop
+### NVIDIA — Workstation / Desktop
 
-Any Ampere (SM80+) or newer NVIDIA GPU should work — the server/datacenter GPUs listed above have been explicitly tested and optimized.
+| GPU | VRAM | Architecture |
+|-----|------|--------------|
+| RTX PRO 6000 | 96 GB | Blackwell (SM120) |
 
-### Edge
+Any Ampere (SM80+) or newer NVIDIA GPU should work — the GPUs listed above have been explicitly tested and optimized.
 
-| Device | VRAM | Notes |
-|--------|------|-------|
-| Jetson AGX Orin | 32/64 GB | JetPack 6.0+ required |
-| Jetson Orin NX | 16 GB | JetPack 6.0+ required |
-| Jetson Orin Nano | 8 GB | JetPack 6.0+ required |
+### Apple Silicon
+
+Photon runs natively on Apple M-series Macs through Metal kernels — no NVIDIA CUDA, no Triton.
+
+| Hardware | Notes |
+|----------|-------|
+| MacBook Pro (M5 Max, 48 GB) | macOS 13+, Python 3.12 |
+| Mac mini / Studio (M2 / M3 / M4 Pro / M4 Max, ≥24 GB) | macOS 13+, Python 3.12 |
+| Mac mini (M4 base, 16 GB) | macOS 13+, Python 3.12 — fits Moondream 2; Moondream 3 weights exceed unified memory |
+
+KV cache size auto-tunes to your machine's unified memory.
+
+### NVIDIA — Edge
+
+| Device | VRAM | JetPack |
+|--------|------|---------|
+| Jetson AGX Thor | 64 GB | JetPack 7 (CUDA 13) |
+| Jetson AGX Orin | 32 / 64 GB | JetPack 6.0+ |
+| Jetson Orin NX | 16 GB | JetPack 6.0+ |
+| Jetson Orin Nano | 8 GB | JetPack 6.0+ |
 
 See [Jetson Setup](#jetson-setup) for installation instructions.
 
+## Apple Silicon Setup
+
+`pip install moondream` is everything you need on a stock Apple Silicon Mac with Python 3.12 — no NVIDIA CUDA, no Triton, no extra environment setup. Photon's Metal kernels cover the full decode path (paged attention, rotary, KV cache, MoE routing, sampling, layer norm).
+
+```bash
+pip install moondream
+```
+
+Verify:
+
+```bash
+python3 -c "
+import moondream as md
+print('moondream:', md.__version__)
+"
+```
+
 ## Jetson Setup
 
-Photon supports NVIDIA Jetson Orin (AGX Orin, Orin NX, Orin Nano) with JetPack 6.0, 6.1, or 6.2.
+### Jetson AGX Thor (JetPack 7)
 
-### Prerequisites
+JetPack 7 ships CUDA 13 and is supported by the standard PyPI PyTorch aarch64 wheel — no custom NVIDIA wheel needed:
 
-- Jetson Orin with JetPack 6.x flashed
-- Python 3.10 (required — NVIDIA's Jetson PyTorch wheels are cp310-only)
-- CUDA runtime (included with JetPack)
+```bash
+pip install moondream
+```
 
-### Install PyTorch
+This pulls in PyTorch and the `nvidia-*-cu13` runtime packages it depends on.
 
-Jetson requires NVIDIA's custom PyTorch wheels. Install the version matching your JetPack release.
+#### Set `LD_LIBRARY_PATH`
+
+PyTorch on Thor loads CUDA libraries from the pip-installed `nvidia-*-cu13` packages and from `nvpl` (NVIDIA Performance Libraries — BLAS / LAPACK / FFT for aarch64), which live under your venv's site-packages rather than `/usr/local/cuda`:
+
+```bash
+SP=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
+LIBS=$(find "$SP" -maxdepth 4 -type d -name lib 2>/dev/null \
+       | grep -E '/(nvidia|nvpl)/' | tr '\n' ':' | sed 's/:$//')
+export LD_LIBRARY_PATH="$LIBS:$LD_LIBRARY_PATH"
+```
+
+Add the export to your shell profile (`~/.bashrc` or similar) so it persists across sessions.
+
+### Jetson AGX Orin / Orin NX / Orin Nano (JetPack 6)
+
+JetPack 6 ships an older CUDA 12.x and requires NVIDIA's custom PyTorch wheel.
+
+#### Prerequisites
+
+- Jetson Orin device with JetPack 6.x flashed.
+- Python 3.10 (matches NVIDIA's JetPack 6 PyTorch wheel).
+- CUDA runtime included with JetPack.
+
+#### Install PyTorch
 
 **JetPack 6.1 / 6.2:**
 ```bash
@@ -160,17 +220,17 @@ pip install https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/
 pip install https://developer.download.nvidia.com/compute/redist/jp/v60/pytorch/torch-2.4.0a0+07cecf4168.nv24.05.14710581-cp310-cp310-linux_aarch64.whl
 ```
 
-### Install Moondream
+#### Install Moondream
 
 ```bash
 pip install "numpy<2" moondream
 ```
 
-The Jetson PyTorch wheels are built against NumPy 1.x, so pinning `numpy<2` avoids compatibility warnings.
+JetPack 6's PyTorch wheel is built against NumPy 1.x, so pinning `numpy<2` avoids the import-time compatibility warning.
 
-### Set `LD_LIBRARY_PATH`
+#### Set `LD_LIBRARY_PATH`
 
-NVIDIA's Jetson PyTorch wheel needs JetPack CUDA libraries on the library path. If `import torch` fails with errors about missing `libnvToolsExt.so.1`, `libcublas.so`, or `libcupti.so`:
+JetPack 6's PyTorch wheel loads CUDA libraries from the system JetPack install. If `import torch` fails with errors about missing `libnvToolsExt.so.1`, `libcublas.so`, or `libcupti.so`:
 
 ```bash
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/targets/aarch64-linux/lib:$LD_LIBRARY_PATH
@@ -184,10 +244,16 @@ sudo apt install cuda-cupti-12-6 libnvtoolsext1
 
 Add the export to your shell profile (`~/.bashrc` or similar) so it persists across sessions.
 
-### Verify
+### Verify (Orin or Thor)
 
 ```bash
-python3 -c "import torch; print(torch.__version__); import moondream; print('moondream OK')"
+python3 -c "
+import torch
+print('torch', torch.__version__, 'cuda', torch.cuda.is_available())
+print('device', torch.cuda.get_device_name(0))
+import moondream
+print('moondream OK')
+"
 ```
 
 ## Triton Inference Server
@@ -240,9 +306,13 @@ docker run --gpus all --rm -it \
 
 ## Performance
 
-Photon uses custom CUDA kernels and optimized scheduling to deliver high throughput. On an H100, Photon achieves over 60 requests/second for visual Q&A with Moondream 2 and over 58 requests/second with Moondream 3.
+Photon uses custom CUDA and Metal kernels with optimized scheduling to deliver high throughput. Highlights:
 
-For detailed benchmarks across all supported GPUs, see [PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
+- **B200** (Blackwell): up to 93 req/s for Moondream 2 and 71 req/s for Moondream 3 visual Q&A.
+- **H100** (Hopper): over 60 req/s for Moondream 2 and over 58 req/s for Moondream 3.
+- **Apple Silicon**: at batch=4 direct mode, ~7 req/s for Moondream 2 and ~5 req/s for Moondream 3 on M5 Max (48 GB).
+
+For detailed benchmarks across all supported hardware, see [PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
 
 ## Environment Variables
 
@@ -253,4 +323,4 @@ For detailed benchmarks across all supported GPUs, see [PERFORMANCE.md](https://
 
 ## Hugging Face Transformers
 
-If you're running on non-NVIDIA hardware, Moondream can also be loaded via [Hugging Face Transformers](/transformers). On NVIDIA GPUs, Photon is strongly recommended — it delivers ~5x higher throughput and ~2.4x lower latency.
+If your hardware isn't on the [Supported Hardware](#supported-hardware) list — for example, an Intel Mac, an AMD GPU, or a non-Ampere NVIDIA GPU — Moondream can also be loaded via [Hugging Face Transformers](/transformers). On supported hardware (NVIDIA Ampere+ or Apple Silicon), Photon is strongly recommended — it delivers ~5× higher throughput and ~2.4× lower latency than the Transformers path on NVIDIA.
