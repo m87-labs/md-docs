@@ -13,8 +13,8 @@ Photon is Moondream's high-performance inference engine for running Moondream lo
 
 - One of:
   - **NVIDIA GPU** (Ampere or newer) on Linux x86_64 / aarch64 or Windows AMD64 — see [Supported Hardware](#supported-hardware) for the full list.
-  - **Apple Silicon Mac** (M-series) on macOS 13 (Ventura) or later, Python 3.12.
-- **Python**: 3.10+ on Linux / Windows; 3.12 on macOS.
+  - **Apple Silicon Mac** (M-series) on macOS 13 (Ventura) or later.
+- **Python**: 3.10–3.14.
 - **API Key**: Get one from [moondream.ai](https://moondream.ai/c/cloud/api-keys).
 
 ## Installation
@@ -134,9 +134,9 @@ Photon runs natively on Apple M-series Macs through Metal kernels — no NVIDIA 
 
 | Hardware | Notes |
 |----------|-------|
-| MacBook Pro (M5 Max, 48 GB) | macOS 13+, Python 3.12 |
-| Mac mini / Studio (M2 / M3 / M4 Pro / M4 Max, ≥24 GB) | macOS 13+, Python 3.12 |
-| Mac mini (M4 base, 16 GB) | macOS 13+, Python 3.12 — fits Moondream 2; Moondream 3 weights exceed unified memory |
+| MacBook Pro (M5 Max, 48 GB) | macOS 13+ |
+| Mac mini / Studio (M2 / M3 / M4 Pro / M4 Max, ≥24 GB) | macOS 13+ |
+| Mac mini (M4 base, 16 GB) | macOS 13+ — fits Moondream 2; Moondream 3 weights exceed unified memory |
 
 ### NVIDIA Jetson
 
