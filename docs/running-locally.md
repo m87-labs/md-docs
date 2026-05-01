@@ -111,7 +111,7 @@ Adapters are automatically downloaded and cached on first use.
 
 ## Supported Hardware
 
-### NVIDIA — Server / Datacenter
+### NVIDIA GPU
 
 | GPU | VRAM | Architecture |
 |-----|------|--------------|
@@ -119,23 +119,18 @@ Adapters are automatically downloaded and cached on first use.
 | H200 | 141 GB | Hopper (SM90) |
 | H100 | 80 GB | Hopper (SM90) |
 | GH200 | 96 GB | Hopper (SM90) |
+| RTX PRO 6000 | 96 GB | Blackwell (SM120) |
 | A100 | 80 GB | Ampere (SM80) |
 | L40S | 48 GB | Ada Lovelace (SM89) |
 | A40 | 48 GB | Ampere (SM86) |
-| A10 | 24 GB | Ampere (SM86) |
 | L4 | 24 GB | Ada Lovelace (SM89) |
+| A10 | 24 GB | Ampere (SM86) |
 
-### NVIDIA — Workstation / Desktop
-
-| GPU | VRAM | Architecture |
-|-----|------|--------------|
-| RTX PRO 6000 | 96 GB | Blackwell (SM120) |
-
-Any Ampere (SM80+) or newer NVIDIA GPU should work — the GPUs listed above have been explicitly tested and optimized.
+Any Ampere (SM80) or newer NVIDIA GPU should work; the cards above are explicitly tested and tuned.
 
 ### Apple Silicon
 
-Photon runs natively on Apple M-series Macs through Metal kernels — no NVIDIA CUDA, no Triton.
+Photon runs natively on Apple M-series Macs through Metal kernels — no NVIDIA CUDA, no Triton, no extra setup beyond `pip install moondream`. KV cache size auto-tunes to your machine's unified memory.
 
 | Hardware | Notes |
 |----------|-------|
@@ -143,9 +138,7 @@ Photon runs natively on Apple M-series Macs through Metal kernels — no NVIDIA 
 | Mac mini / Studio (M2 / M3 / M4 Pro / M4 Max, ≥24 GB) | macOS 13+, Python 3.12 |
 | Mac mini (M4 base, 16 GB) | macOS 13+, Python 3.12 — fits Moondream 2; Moondream 3 weights exceed unified memory |
 
-KV cache size auto-tunes to your machine's unified memory.
-
-### NVIDIA — Edge
+### NVIDIA Jetson
 
 | Device | VRAM | JetPack |
 |--------|------|---------|
@@ -154,26 +147,11 @@ KV cache size auto-tunes to your machine's unified memory.
 | Jetson Orin NX | 16 GB | JetPack 6.0+ |
 | Jetson Orin Nano | 8 GB | JetPack 6.0+ |
 
-See [Jetson Setup](#jetson-setup) for installation instructions.
-
-## Apple Silicon Setup
-
-`pip install moondream` is everything you need on a stock Apple Silicon Mac with Python 3.12 — no NVIDIA CUDA, no Triton, no extra environment setup. Photon's Metal kernels cover the full decode path (paged attention, rotary, KV cache, MoE routing, sampling, layer norm).
-
-```bash
-pip install moondream
-```
-
-Verify:
-
-```bash
-python3 -c "
-import moondream as md
-print('moondream:', md.__version__)
-"
-```
+Jetson needs an extra setup step for `LD_LIBRARY_PATH` — see [Jetson Setup](#jetson-setup) below.
 
 ## Jetson Setup
+
+Jetson Thor (JetPack 7) and Jetson Orin (JetPack 6) install differently because the two JetPack versions ship different CUDA major versions and PyTorch wheels.
 
 ### Jetson AGX Thor (JetPack 7)
 
@@ -183,17 +161,11 @@ JetPack 7 ships CUDA 13 and is supported by the standard PyPI PyTorch aarch64 wh
 pip install moondream
 ```
 
-This pulls in PyTorch and the `nvidia-*-cu13` runtime packages it depends on.
-
-#### Set `LD_LIBRARY_PATH`
-
-PyTorch on Thor loads CUDA libraries from the pip-installed `nvidia-*-cu13` packages and from `nvpl` (NVIDIA Performance Libraries — BLAS / LAPACK / FFT for aarch64), which live under your venv's site-packages rather than `/usr/local/cuda`:
+This pulls in PyTorch along with the `nvidia-*-cu13` runtime packages and `nvpl` (NVIDIA Performance Libraries: BLAS / LAPACK / FFT for aarch64). Those libraries live under your venv's `site-packages` rather than `/usr/local/cuda`, so you need to point `LD_LIBRARY_PATH` at them once before importing torch:
 
 ```bash
-SP=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
-LIBS=$(find "$SP" -maxdepth 4 -type d -name lib 2>/dev/null \
-       | grep -E '/(nvidia|nvpl)/' | tr '\n' ':' | sed 's/:$//')
-export LD_LIBRARY_PATH="$LIBS:$LD_LIBRARY_PATH"
+SITE=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
+export LD_LIBRARY_PATH="$SITE/nvidia/cu13/lib:$SITE/nvidia/cudnn/lib:$SITE/nvpl/lib:$LD_LIBRARY_PATH"
 ```
 
 Add the export to your shell profile (`~/.bashrc` or similar) so it persists across sessions.
@@ -247,14 +219,10 @@ Add the export to your shell profile (`~/.bashrc` or similar) so it persists acr
 ### Verify (Orin or Thor)
 
 ```bash
-python3 -c "
-import torch
-print('torch', torch.__version__, 'cuda', torch.cuda.is_available())
-print('device', torch.cuda.get_device_name(0))
-import moondream
-print('moondream OK')
-"
+python3 -c "import torch, moondream; print(torch.__version__, torch.cuda.get_device_name(0))"
 ```
+
+You should see something like `2.9.1 NVIDIA Thor` (Thor) or `2.5.0a0+... Orin` (Orin). If you see a `libcudart.so.X` / `libnvToolsExt.so.1` / `libcupti.so` `cannot open shared object file` error, your `LD_LIBRARY_PATH` doesn't cover the right directory — re-check the previous step.
 
 ## Triton Inference Server
 
@@ -306,13 +274,16 @@ docker run --gpus all --rm -it \
 
 ## Performance
 
-Photon uses custom CUDA and Metal kernels with optimized scheduling to deliver high throughput. Highlights:
+Headline ChartQA req/s on Moondream 2 / Moondream 3 visual Q&A:
 
-- **B200** (Blackwell): up to 93 req/s for Moondream 2 and 71 req/s for Moondream 3 visual Q&A.
-- **H100** (Hopper): over 60 req/s for Moondream 2 and over 58 req/s for Moondream 3.
-- **Apple Silicon**: at batch=4 direct mode, ~7 req/s for Moondream 2 and ~5 req/s for Moondream 3 on M5 Max (48 GB).
+| Hardware | Batch | Moondream 2 | Moondream 3 |
+|----------|------:|------------:|------------:|
+| B200 (Blackwell)        | 64 | 93 | 71 |
+| H100 (Hopper)           | 64 | 63 | 58 |
+| RTX PRO 6000 (Blackwell)| 64 | 39 | 40 |
+| MacBook Pro M5 Max      |  4 | 7.3 | 4.6 |
 
-For detailed benchmarks across all supported hardware, see [PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
+For the full breakdown across every supported card and batch size — including P50/P90/P99 latency and Jetson Thor / Orin numbers — see [PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
 
 ## Environment Variables
 
