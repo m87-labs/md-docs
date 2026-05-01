@@ -151,7 +151,7 @@ Jetson needs an extra setup step for `LD_LIBRARY_PATH` — see [Jetson Setup](#j
 
 ## Jetson Setup
 
-Jetson Thor (JetPack 7) and Jetson Orin (JetPack 6) install differently because the two JetPack versions ship different CUDA major versions and PyTorch wheels.
+Jetson Thor (JetPack 7) and Jetson Orin (JetPack 6) install differently because the two JetPack versions ship different CUDA major versions and PyTorch wheels. The instructions below cover the common path; for extra troubleshooting (cuSPARSELt errors, missing CUDA packages on minimal images, etc.) see the canonical [kestrel Jetson setup guide](https://github.com/m87-labs/kestrel/blob/main/docs/jetson.md).
 
 ### Jetson AGX Thor (JetPack 7)
 
