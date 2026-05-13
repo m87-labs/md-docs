@@ -455,6 +455,17 @@ article {
   padding-bottom: 3rem;
 }
 
+.markdown .docs-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--md-border);
+  border-radius: var(--ifm-global-radius);
+  background: var(--ifm-background-surface-color);
+  object-fit: cover;
+}
+
 /* ─── Breadcrumbs ────────────────────────────────────────────────────── */
 .breadcrumbs {
   margin-bottom: 1.25rem;
