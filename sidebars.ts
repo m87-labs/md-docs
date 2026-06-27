@@ -18,6 +18,7 @@ const sidebars: SidebarsConfig = {
     'overview',
     'quickstart',
     'api',
+    'openai',
     'streaming',
     'batch',
     'reasoning',

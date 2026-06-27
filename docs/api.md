@@ -11,6 +11,8 @@ https://api.moondream.ai/v1/
 ```
 All API requests use this base URL with skill-specific endpoints (`/query`, `/detect`, `/point`, `/caption`, `/segment`).
 
+Prefer an OpenAI-style chat interface? Moondream also offers an [OpenAI-compatible `/v1/chat/completions` endpoint](/openai) with multi-turn conversations, streaming, and image inputs.
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
