@@ -184,7 +184,7 @@ See [Reasoning](/reasoning) for more on how Moondream 3 reasons.
 | `messages` | array | OpenAI chat messages. `content` may be a string or an array of `text` / `image_url` parts. |
 | `temperature` | number | Sampling temperature. |
 | `top_p` | number | Nucleus sampling. |
-| `max_tokens` | integer | Maximum completion tokens (up to 4096). |
+| `max_completion_tokens` | integer | Maximum number of tokens to generate, including reasoning tokens (up to 4096). |
 | `reasoning` | boolean | Enable the reasoning trace (returned on `message.reasoning`). |
 | `stream` | boolean | Stream the response as SSE. |
 | `stream_options.include_usage` | boolean | Emit a final usage chunk in a stream. |
