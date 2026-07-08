@@ -625,7 +625,7 @@ Once you have saved a checkpoint, you can use it for inference by specifying the
 ### Model format
 
 ```
-moondream3-preview/{finetune_id}@{step}
+{base_model}/{finetune_id}@{step}
 ```
 
 For example, if your finetune ID is `01HXYZ...` and you saved a checkpoint at step 500:
@@ -663,6 +663,5 @@ The `model` parameter is supported on the following inference endpoints:
 
 - Include the `model` parameter on inference requests.
 - Only saved checkpoints can be used for inference. Use `POST /finetunes/:finetuneId/checkpoints/save` to save a checkpoint first.
-- Both the `finetune_id` and `step` are required in the model string.
-- Finetuned checkpoints are only supported for `moondream3-preview`; `moondream3.1-9B-A2B` does not support finetunes.
+- The `base_model`, `finetune_id`, and `step` are required in the model string.
 - Finetune inference is only available for authenticated API requests (not available in playground mode).

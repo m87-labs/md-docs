@@ -102,7 +102,7 @@ curl -X POST https://api.moondream.ai/v1/query \
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `model` | string | Yes | Model ID. Supported values: `moondream3.1-9B-A2B`, `moondream3-preview`, or a `moondream3-preview/{finetune_id}@{step}` checkpoint. |
+| `model` | string | Yes | Model ID. Supported values include `moondream3.1-9B-A2B`, `moondream3-preview`, or a saved finetuned checkpoint in `{base_model}/{finetune_id}@{step}` format. |
 | `image_url` | string | Yes | Base64 data URL for the input image. |
 | `question` | string | Yes | Question to answer about the image. |
 | `reasoning` | boolean | No | Enable reasoning trace for non-streaming requests. |

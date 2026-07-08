@@ -15,12 +15,13 @@ Prefer an OpenAI-style chat interface? Moondream also offers an [OpenAI-compatib
 
 ### Model selection
 
-Every direct API request must include a `model` field. Supported model IDs:
+Every direct API request must include a `model` field. Supported model values:
 
 | Model | Notes |
 |-------|-------|
-| `moondream3.1-9B-A2B` | Moondream 3.1 model. Finetuned checkpoints are not supported. |
-| `moondream3-preview` | Moondream 3 Preview model. Use this for finetuned checkpoints with `moondream3-preview/{finetune_id}@{step}`. |
+| `moondream3.1-9B-A2B` | Moondream 3.1 model. |
+| `moondream3-preview` | Moondream 3 Preview model. |
+| `{base_model}/{finetune_id}@{step}` | Saved finetuned checkpoint. |
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';

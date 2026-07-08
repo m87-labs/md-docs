@@ -9,7 +9,7 @@ The Batch API lets you process large volumes of images asynchronously. Upload a 
 
 **Pricing:** Batch API requests are billed at **50% off** standard API pricing. When using finetuned models, batch pricing is 50% off finetune pricing. See [pricing](https://moondream.ai/pricing) for details.
 
-Each batch runs on a single model selected when you complete the upload. Set `model` to `moondream3.1-9B-A2B`, `moondream3-preview`, or a saved `moondream3-preview/{finetune_id}@{step}` checkpoint.
+Each batch runs on a single model selected when you complete the upload. Set `model` to a base model ID such as `moondream3.1-9B-A2B` or `moondream3-preview`, or to a saved finetuned checkpoint in `{base_model}/{finetune_id}@{step}` format.
 
 ## When to use Batch API
 
@@ -408,7 +408,7 @@ Content-Type: application/json
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `parts` | array | Yes | Array of uploaded parts with `partNumber` and `etag` |
-| `model` | string | Yes | Model ID: `moondream3.1-9B-A2B`, `moondream3-preview`, or `moondream3-preview/finetune_id@step` |
+| `model` | string | Yes | Model ID or saved checkpoint, e.g. `moondream3.1-9B-A2B`, `moondream3-preview`, or `{base_model}/finetune_id@step` |
 
 **Response:**
 ```json
@@ -473,7 +473,7 @@ GET /v1/batch/:batchId
 
 | Code | Description |
 |------|-------------|
-| `invalid_model` | Model format invalid (must be `moondream3.1-9B-A2B`, `moondream3-preview`, or `moondream3-preview/finetune_id@step`) |
+| `invalid_model` | Model format invalid (must be a supported base model ID or saved checkpoint in `{base_model}/finetune_id@step` format) |
 | `validation_error` | Invalid JSONL, blank lines, or bad UTF-8 |
 | `limit_exceeded` | File or line limits exceeded |
 | `empty_batch` | No valid lines in file |
@@ -491,7 +491,7 @@ GET /v1/batch/:batchId
 
 ## Using finetuned models
 
-You can run batch jobs using your finetuned models by specifying a `moondream3-preview` checkpoint in the `model` parameter when completing the upload:
+You can run batch jobs using your finetuned models by specifying a saved checkpoint in the `model` parameter when completing the upload:
 
 ```bash
 curl -s -X POST "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-complete&uploadId=$UPLOAD_ID" \
@@ -499,11 +499,12 @@ curl -s -X POST "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-complete&
   -H "Content-Type: application/json" \
   -d '{
     "parts": [...],
-    "model": "moondream3-preview/YOUR_FINETUNE_ID@STEP"
+    "model": "{base_model}/YOUR_FINETUNE_ID@STEP"
   }'
 ```
 
-The model format is `moondream3-preview/finetune_id@step`, where:
+The model format is `{base_model}/finetune_id@step`, where:
+- `base_model` is the model family used for the finetune
 - `finetune_id` is your finetune's ID (e.g., `01JQXYZ...`)
 - `step` is the checkpoint step number
 
