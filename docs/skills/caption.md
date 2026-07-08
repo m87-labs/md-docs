@@ -89,6 +89,7 @@ curl -X POST https://api.moondream.ai/v1/caption \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "length": "normal",
     "stream": false
@@ -99,6 +100,7 @@ curl -X POST https://api.moondream.ai/v1/caption \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "length": "short",
     "stream": false
@@ -109,6 +111,7 @@ curl -X POST https://api.moondream.ai/v1/caption \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "length": "normal",
     "stream": true
@@ -142,6 +145,15 @@ For streaming responses, you'll receive a series of data events:
 
 - **"short"**: Brief 1-2 sentence summary (e.g., "A red car parked on a street.")
 - **"normal"** (default): Detailed description covering elements, context, colors, positioning, etc.
+
+## Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model` | string | Yes | Model ID. Supported values include `moondream3.1-9B-A2B`, `moondream3-preview`, or a saved finetuned checkpoint in `{base_model}/{finetune_id}@{step}` format. |
+| `image_url` | string | Yes | Base64 data URL for the input image. |
+| `length` | string | No | Caption length: `short`, `normal`, or `long`. Defaults to `normal`. |
+| `stream` | boolean | No | Stream caption chunks as Server-Sent Events. |
 
 ## Use Cases
 
