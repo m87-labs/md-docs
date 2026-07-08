@@ -3,7 +3,7 @@ id: reasoning
 slug: /reasoning
 title: Reasoning
 ---
-```bash {7}
+```bash {8}
 curl -X POST https://api.moondream.ai/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \

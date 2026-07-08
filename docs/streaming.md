@@ -8,7 +8,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import StreamingDemo from '@site/src/components/StreamingDemo';
 
-```bash {7}
+```bash {8}
 curl -N -X POST https://api.moondream.ai/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
