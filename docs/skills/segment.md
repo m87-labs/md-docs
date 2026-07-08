@@ -73,6 +73,7 @@ curl -X POST https://api.moondream.ai/v1/segment \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "object": "cat"
   }'
@@ -94,6 +95,16 @@ curl -X POST https://api.moondream.ai/v1/segment \
   }
 }
 ```
+
+## Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model` | string | Yes | Model ID. Supported values: `moondream3.1-9B-A2B` or `moondream3-preview`. Finetuned checkpoints are not supported for segmentation. |
+| `image_url` | string | Yes | Base64 data URL for the input image. |
+| `object` | string | Yes | Object or visual phrase to segment. |
+| `spatial_refs` | array | No | Optional normalized point or bounding box hints. |
+| `stream` | boolean | No | Stream bounding box and path updates as Server-Sent Events. |
 
 ## Spatial References
 
@@ -148,6 +159,7 @@ curl -N -X POST https://api.moondream.ai/v1/segment \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "object": "cat",
     "stream": true

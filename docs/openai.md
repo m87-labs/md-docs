@@ -8,7 +8,7 @@ Moondream Cloud exposes an **OpenAI-compatible** chat endpoint at `/v1/chat/comp
 
 ## Setup
 
-Use the OpenAI base URL `https://api.moondream.ai/v1`, your Moondream API key as the bearer token, and `moondream/moondream3-preview` as the model (the `moondream/` prefix is optional for this first-party model, so `moondream3-preview` also works). Grab a key from the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys).
+Use the OpenAI base URL `https://api.moondream.ai/v1`, your Moondream API key as the bearer token, and set `model` to one of the supported Moondream model IDs. The examples below use `moondream3.1-9B-A2B`. Grab a key from the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys).
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -25,7 +25,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[{"role": "user", "content": "What is 2 + 2?"}],
 )
 print(response.choices[0].message.content)
@@ -43,7 +43,7 @@ const client = new OpenAI({
 });
 
 const response = await client.chat.completions.create({
-  model: "moondream/moondream3-preview",
+  model: "moondream3.1-9B-A2B",
   messages: [{ role: "user", content: "What is 2 + 2?" }],
 });
 console.log(response.choices[0].message.content);
@@ -57,7 +57,7 @@ curl https://api.moondream.ai/v1/chat/completions \
   -H 'Authorization: Bearer YOUR_API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
-    "model": "moondream/moondream3-preview",
+    "model": "moondream3.1-9B-A2B",
     "messages": [{"role": "user", "content": "What is 2 + 2?"}]
   }'
 ```
@@ -79,7 +79,7 @@ with open("image.jpg", "rb") as f:
     data_url = "data:image/jpeg;base64," + base64.b64encode(f.read()).decode()
 
 response = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[{
         "role": "user",
         "content": [
@@ -99,7 +99,7 @@ curl https://api.moondream.ai/v1/chat/completions \
   -H 'Authorization: Bearer YOUR_API_KEY' \
   -H 'Content-Type: application/json' \
   -d '{
-    "model": "moondream/moondream3-preview",
+    "model": "moondream3.1-9B-A2B",
     "messages": [{
       "role": "user",
       "content": [
@@ -119,7 +119,7 @@ Send the full message history — earlier turns are kept as context.
 
 ```python
 response = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[
         {"role": "user", "content": "My name is Alice."},
         {"role": "assistant", "content": "Nice to meet you, Alice!"},
@@ -135,7 +135,7 @@ Set `stream=True` to receive the response as Server-Sent Events.
 
 ```python
 stream = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[{"role": "user", "content": "Write a short poem about the moon."}],
     stream=True,
 )
@@ -149,7 +149,7 @@ By default a stream does not include token usage. To receive it, set `stream_opt
 
 ```python
 stream = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[{"role": "user", "content": "Hello!"}],
     stream=True,
     stream_options={"include_usage": True},
@@ -165,7 +165,7 @@ Moondream 3 can produce an explicit reasoning trace before its answer. Enable it
 
 ```python
 response = client.chat.completions.create(
-    model="moondream/moondream3-preview",
+    model="moondream3.1-9B-A2B",
     messages=[{"role": "user", "content": "If I have 5 apples and give away 2, how many are left?"}],
     extra_body={"reasoning": True},
 )
@@ -180,7 +180,7 @@ See [Reasoning](/reasoning) for more on how Moondream 3 reasons.
 
 | Parameter | Type | Notes |
 |---|---|---|
-| `model` | string | `moondream/moondream3-preview`. See [Models](#models) for the available list. |
+| `model` | string | Required. Supported values: `moondream3.1-9B-A2B` or `moondream3-preview`. |
 | `messages` | array | OpenAI chat messages. `content` may be a string or an array of `text` / `image_url` parts. |
 | `temperature` | number | Sampling temperature. |
 | `top_p` | number | Nucleus sampling. |
@@ -199,3 +199,10 @@ List the available models with the standard OpenAI models endpoint:
 curl https://api.moondream.ai/v1/models \
   -H 'Authorization: Bearer YOUR_API_KEY'
 ```
+
+Public model IDs:
+
+| Model | Notes |
+|-------|-------|
+| `moondream3.1-9B-A2B` | Moondream 3.1 model. |
+| `moondream3-preview` | Moondream 3 Preview model. |

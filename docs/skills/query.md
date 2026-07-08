@@ -80,6 +80,7 @@ curl -X POST https://api.moondream.ai/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "question": "What is in this image?"
   }'
@@ -96,6 +97,16 @@ curl -X POST https://api.moondream.ai/v1/query \
   "answer": "Detailed text answer to your question..."
 }
 ```
+
+## Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model` | string | Yes | Model ID. Supported values: `moondream3.1-9B-A2B`, `moondream3-preview`, or a `moondream3-preview/{finetune_id}@{step}` checkpoint. |
+| `image_url` | string | Yes | Base64 data URL for the input image. |
+| `question` | string | Yes | Question to answer about the image. |
+| `reasoning` | boolean | No | Enable reasoning trace for non-streaming requests. |
+| `stream` | boolean | No | Stream answer chunks as Server-Sent Events. |
 
 ## Best Practices
 

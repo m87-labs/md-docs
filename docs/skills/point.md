@@ -92,6 +92,7 @@ curl -X POST https://api.moondream.ai/v1/point \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "object": "face"
   }'
@@ -113,6 +114,14 @@ curl -X POST https://api.moondream.ai/v1/point \
   ]
 }
 ```
+
+## Parameters
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `model` | string | Yes | Model ID. Supported values: `moondream3.1-9B-A2B`, `moondream3-preview`, or a `moondream3-preview/{finetune_id}@{step}` checkpoint. |
+| `image_url` | string | Yes | Base64 data URL for the input image. |
+| `object` | string | Yes | Object or visual phrase to locate. |
 
 ## Point vs. Detect
 

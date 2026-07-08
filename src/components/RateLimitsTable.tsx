@@ -13,6 +13,26 @@ export default function RateLimitsTable() {
                 <div className={styles.tableBody}>
                     <div className={styles.row}>
                         <div className={styles.cell}>
+                            <span className={styles.modelName}>moondream3.1-9B-A2B</span>
+                        </div>
+                        <div className={styles.cell}>
+                            <div>
+                                <span className={styles.rateValue}>2</span>
+                                <span className={styles.rateUnit}>req/sec</span>
+                            </div>
+                            <div className={styles.tierNote}>Default for all API keys</div>
+                        </div>
+                        <div className={styles.cell}>
+                            <div>
+                                <span className={styles.rateValue}>10</span>
+                                <span className={styles.rateUnit}>req/sec</span>
+                            </div>
+                            <div className={styles.tierNote}>≥ $10 account balance</div>
+                        </div>
+                    </div>
+
+                    <div className={styles.row}>
+                        <div className={styles.cell}>
                             <span className={styles.modelName}>moondream3-preview</span>
                         </div>
                         <div className={styles.cell}>
@@ -35,4 +55,3 @@ export default function RateLimitsTable() {
         </div>
     );
 }
-

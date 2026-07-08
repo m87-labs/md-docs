@@ -13,6 +13,15 @@ All API requests use this base URL with skill-specific endpoints (`/query`, `/de
 
 Prefer an OpenAI-style chat interface? Moondream also offers an [OpenAI-compatible `/v1/chat/completions` endpoint](/openai) with multi-turn conversations, streaming, and image inputs.
 
+### Model selection
+
+Every direct API request must include a `model` field. Supported model IDs:
+
+| Model | Notes |
+|-------|-------|
+| `moondream3.1-9B-A2B` | Moondream 3.1 model. Finetuned checkpoints are not supported. |
+| `moondream3-preview` | Moondream 3 Preview model. Use this for finetuned checkpoints with `moondream3-preview/{finetune_id}@{step}`. |
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
@@ -26,6 +35,7 @@ curl -X POST https://api.moondream.ai/v1/query \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
     "question": "What is in this image?"
   }'
@@ -49,6 +59,7 @@ curl -X POST https://api.moondream.ai/v1/detect \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
     "object": "moon"
   }'
@@ -79,6 +90,7 @@ curl -X POST https://api.moondream.ai/v1/point \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
     "object": "moon"
   }'
@@ -107,6 +119,7 @@ curl -X POST https://api.moondream.ai/v1/caption \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,/9j//gAQTGF2YzYxLjE5LjEwMQD/2wBDAAg+Pkk+SVVVVVVVVWRdZGhoaGRkZGRoaGhwcHCDg4NwcHBoaHBwfHyDg4+Tj4eHg4eTk5ubm7q6srLZ2eD/////xABZAAADAQEBAQAAAAAAAAAAAAAABgcFCAECAQEAAAAAAAAAAAAAAAAAAAAAEAADAAMBAQEBAAAAAAAAAAAAAQIDIREEURKBEQEAAAAAAAAAAAAAAAAAAAAA/8AAEQgAGQAZAwESAAISAAMSAP/aAAwDAQACEQMRAD8A5/PQAAABirHyVS2mUip/Pm4/vQAih9ABuRUrVLqMEALVNead7/pFgAfc+d5NLSEEAAAA/9k=",
     "length": "normal",
     "stream": false
@@ -138,6 +151,7 @@ curl -X POST https://api.moondream.ai/v1/segment \
   -H 'Content-Type: application/json' \
   -H 'X-Moondream-Auth: YOUR_API_KEY' \
   -d '{
+    "model": "moondream3.1-9B-A2B",
     "image_url": "data:image/jpeg;base64,...",
     "object": "cat"
   }'
@@ -158,4 +172,3 @@ curl -X POST https://api.moondream.ai/v1/segment \
 
   </TabItem>
 </Tabs>
-
