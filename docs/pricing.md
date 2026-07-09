@@ -3,7 +3,7 @@ id: pricing
 slug: /pricing
 title: Cloud pricing
 sidebar_position: 2
-description: Usage-based pricing for Moondream Cloud, including token rates, included features, and validity details.
+description: Usage-based pricing for Moondream Cloud, including per-model token rates, batch rates, Lens fine-tuning rates, included features, and validity details.
 ---
 
 # Cloud pricing
@@ -20,10 +20,37 @@ Moondream runs anywhere. For the easiest, fastest, and cheapest way to use it, w
 
 ### Token rates
 
-| Token type | Price |
-|------------|-------|
-| Input tokens | $0.30 per million tokens |
-| Output tokens | $2.50 per million tokens |
+Rates are billed per million tokens and vary by model. [Batch API](/batch) requests are billed at 50% off real-time pricing.
+
+#### Moondream 3.1 9B A2B
+
+Model ID: `moondream3.1-9B-A2B`
+
+| | Input tokens | Output tokens |
+|---|--------------|---------------|
+| Real-time | $0.30 per million | $1.00 per million |
+| Batch | $0.15 per million | $0.50 per million |
+
+#### Moondream 3 Preview
+
+Model ID: `moondream3-preview`
+
+| | Input tokens | Output tokens |
+|---|--------------|---------------|
+| Real-time | $0.30 per million | $2.50 per million |
+| Batch | $0.15 per million | $1.25 per million |
+
+:::note
+Moondream 3 Preview continues to be offered at its original rates. As new models are released, each will be listed here with its own rates.
+:::
+
+### Lens fine-tuning
+
+| Item | Price |
+|------|-------|
+| Training | $0.60 per million training tokens |
+
+Rollout inference during training and inference on your finetuned checkpoints are billed at the base model's cloud rates above. See the [fine-tuning docs](/finetuning) for details.
 
 :::info Start instantly
 Create an account and launch requests immediately (no sales conversations required!).
