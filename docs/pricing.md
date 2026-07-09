@@ -22,10 +22,37 @@ Moondream runs anywhere. For the easiest, fastest, and cheapest way to use it, w
 
 All prices are USD per 1M tokens. [Batch API](/batch) requests are billed at 50% off real-time rates.
 
-| Model | Real-time in | Real-time out | Batch in | Batch out |
-|-------|-------------:|--------------:|---------:|----------:|
-| Moondream 3.1 9B A2B (`moondream3.1-9B-A2B`) | $0.30 | $1.00 | $0.15 | $0.50 |
-| Moondream 3 Preview (`moondream3-preview`) | $0.30 | $2.50 | $0.15 | $1.25 |
+<table>
+  <thead>
+    <tr>
+      <th rowSpan={2} style={{verticalAlign: 'middle'}}>Model</th>
+      <th colSpan={2} style={{textAlign: 'center'}}>Real-time</th>
+      <th colSpan={2} style={{textAlign: 'center'}}>Batch</th>
+    </tr>
+    <tr>
+      <th style={{width: '13%', textAlign: 'right'}}>In</th>
+      <th style={{width: '13%', textAlign: 'right'}}>Out</th>
+      <th style={{width: '13%', textAlign: 'right'}}>In</th>
+      <th style={{width: '13%', textAlign: 'right'}}>Out</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Moondream 3.1 9B A2B (<code>moondream3.1-9B-A2B</code>)</td>
+      <td style={{textAlign: 'right'}}>$0.30</td>
+      <td style={{textAlign: 'right'}}>$1.00</td>
+      <td style={{textAlign: 'right'}}>$0.15</td>
+      <td style={{textAlign: 'right'}}>$0.50</td>
+    </tr>
+    <tr>
+      <td>Moondream 3 Preview (<code>moondream3-preview</code>)</td>
+      <td style={{textAlign: 'right'}}>$0.30</td>
+      <td style={{textAlign: 'right'}}>$2.50</td>
+      <td style={{textAlign: 'right'}}>$0.15</td>
+      <td style={{textAlign: 'right'}}>$1.25</td>
+    </tr>
+  </tbody>
+</table>
 
 :::note
 Moondream 3 Preview continues to be offered at its original rates. As new models are released, each will be listed here with its own rates.
