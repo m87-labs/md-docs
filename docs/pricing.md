@@ -20,25 +20,12 @@ Moondream runs anywhere. For the easiest, fastest, and cheapest way to use it, w
 
 ### Token rates
 
-Rates are billed per million tokens and vary by model. [Batch API](/batch) requests are billed at 50% off real-time pricing.
+All prices are USD per 1M tokens. [Batch API](/batch) requests are billed at 50% off real-time rates.
 
-#### Moondream 3.1 9B A2B
-
-Model ID: `moondream3.1-9B-A2B`
-
-| | Input tokens | Output tokens |
-|---|--------------|---------------|
-| Real-time | $0.30 per million | $1.00 per million |
-| Batch | $0.15 per million | $0.50 per million |
-
-#### Moondream 3 Preview
-
-Model ID: `moondream3-preview`
-
-| | Input tokens | Output tokens |
-|---|--------------|---------------|
-| Real-time | $0.30 per million | $2.50 per million |
-| Batch | $0.15 per million | $1.25 per million |
+| Model | Real-time in | Real-time out | Batch in | Batch out |
+|-------|-------------:|--------------:|---------:|----------:|
+| Moondream 3.1 9B A2B (`moondream3.1-9B-A2B`) | $0.30 | $1.00 | $0.15 | $0.50 |
+| Moondream 3 Preview (`moondream3-preview`) | $0.30 | $2.50 | $0.15 | $1.25 |
 
 :::note
 Moondream 3 Preview continues to be offered at its original rates. As new models are released, each will be listed here with its own rates.
