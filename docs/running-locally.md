@@ -37,7 +37,7 @@ import moondream as md
 from PIL import Image
 
 # Initialize Photon local inference (NVIDIA GPU or Apple Silicon)
-model = md.photon()
+model = md.photon("moondream3-preview")
 
 # Load an image
 image = Image.open("path/to/image.jpg")
@@ -71,16 +71,16 @@ segment = model.segment(image, "person")
 print("SVG path:", segment["path"])
 ```
 
-`md.vl(local=True, ...)` remains supported for existing applications and
-delegates to `md.photon(...)`.
+`md.vl(local=True, model="moondream3-preview", ...)` remains supported for
+existing applications and delegates to `md.photon(...)`.
 
 ## Configuration
 
 ### Model Selection
 
 ```python
-# Moondream 3 Preview (default)
-moondream3 = md.photon()
+# Moondream 3 Preview
+moondream3 = md.photon("moondream3-preview")
 
 # Moondream 2
 moondream2 = md.photon("moondream2")
