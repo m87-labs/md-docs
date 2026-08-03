@@ -9,10 +9,6 @@ const config: Config = {
 
   clientModules: [require.resolve('./src/theme-sync.ts')],
 
-  future: {
-    v4: true,
-  },
-
   url: 'https://docs.moondream.ai',
   baseUrl: '/',
 
@@ -20,7 +16,11 @@ const config: Config = {
   projectName: 'md-docs',
 
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
 
   i18n: {
     defaultLocale: 'en',
