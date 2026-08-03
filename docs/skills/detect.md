@@ -32,9 +32,7 @@ image = Image.open("path/to/image.jpg")
 # Detect objects (e.g., "person", "car", "face", etc.)
 result = model.detect(image, "person")
 detections = result["objects"]
-request_id = result["request_id"]
 print(f"Found {len(detections)} people")
-print(f"Request ID: {request_id}")
 
 # Visualize the detections
 plt.figure(figsize=(10, 10))
@@ -88,7 +86,6 @@ const result = await model.detect({
   object: "person"
 });
 console.log(`Found ${result.objects.length} people`);
-console.log(`Request ID: ${result.request_id}`);
 
 // Process the detections
 result.objects.forEach((obj, index) => {

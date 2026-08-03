@@ -55,7 +55,7 @@ model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2",
     trust_remote_code=True,
     dtype=torch.bfloat16,
-    device_map="mps", # "cuda" on Nvidia GPUs
+    device_map="mps", # "cuda" on NVIDIA GPUs
 )
 
 # Load your image
@@ -114,7 +114,7 @@ model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2",
     trust_remote_code=True,
     dtype=torch.bfloat16,
-    device_map="mps", # "cuda" on Nvidia GPUs
+    device_map="mps", # "cuda" on NVIDIA GPUs
 )
 
 # Load your image
@@ -195,7 +195,7 @@ model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2",
     trust_remote_code=True,
     dtype=torch.bfloat16,
-    device_map="mps", # "cuda" on Nvidia GPUs
+    device_map="mps", # "cuda" on NVIDIA GPUs
 )
 
 # Load your image
@@ -254,7 +254,7 @@ model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2",
     trust_remote_code=True,
     dtype=torch.bfloat16,
-    device_map="mps", # "cuda" on Nvidia GPUs
+    device_map="mps", # "cuda" on NVIDIA GPUs
 )
 
 # Load your image
@@ -286,9 +286,9 @@ print(result)
 </TabItem>
 </Tabs>
 
-## Moondream3
+## Moondream 3
 
-[Sign up for early access](https://huggingface.co/moondream/moondream3-preview) to start using [Moondream3](https://moondream.ai/blog/moondream-3-preview). Through this Transformers path, only NVIDIA GPUs with 24GB+ of memory are supported today; quantized and Apple Silicon Transformers variants are coming soon. To run Moondream 3 on Apple Silicon now, use [Photon](/running-locally) — `md.vl(api_key="...", local=True, model="moondream3-preview")` works on any M-series Mac with ≥24GB unified memory.
+[Moondream 3 Preview](https://huggingface.co/moondream/moondream3-preview) is available through Transformers on NVIDIA GPUs with at least 24GB of memory. To run it on Apple Silicon, use [Photon](/running-locally) — `md.photon("moondream3-preview")` works on any M-series Mac with ≥24GB unified memory.
 
 ```python
 model = AutoModelForCausalLM.from_pretrained(
@@ -308,8 +308,8 @@ Caption and Query both support streaming, displaying tokens immediately as they 
 ```python
 model = AutoModelForCausalLM.from_pretrained(
     "vikhyatk/moondream2",
-    revision="2025-01-09",
     trust_remote_code=True,
+    dtype=torch.bfloat16,
     device_map="mps",  # "cuda" for NVIDIA GPUs
 )
 
@@ -321,7 +321,7 @@ for t in model.caption(image, length="normal", stream=True)["caption"]:
 
 ### Compile
 
-If you are using the model to make multiple inference calls, compiling can noticeably improve generation speed. This is especially true for [Moondream3](https://huggingface.co/moondream/moondream3-preview), as it uses [FlexAttention](https://pytorch.org/blog/flexattention-for-inference/). After the model has been created, call `model.compile()`.
+If you are using the model to make multiple inference calls, compiling can noticeably improve generation speed. This is especially true for [Moondream 3](https://huggingface.co/moondream/moondream3-preview), as it uses [FlexAttention](https://pytorch.org/blog/flexattention-for-inference/). After the model has been created, call `model.compile()`.
 
 ```python
 model = AutoModelForCausalLM.from_pretrained(
@@ -345,4 +345,3 @@ encoded_image = model.encode_image(image)
 print(model.caption(encoded_image, length="short")["caption"])
 print(model.query(encoded_image, "How many people are in the image?")["answer"])
 ```
-

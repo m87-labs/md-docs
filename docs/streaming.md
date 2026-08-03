@@ -151,7 +151,7 @@ import fs from 'fs';
 const model = new vl({ apiKey: 'YOUR_API_KEY' });
 const image = fs.readFileSync('path/to/image.jpg');
 
-const stream = await model.segment({
+const { stream } = await model.segment({
   image: image,
   object: 'cat',
   stream: true

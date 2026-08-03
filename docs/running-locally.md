@@ -7,7 +7,10 @@ description: High-performance local inference with Photon on NVIDIA GPUs and App
 
 # Run Moondream Locally
 
-Photon is Moondream's high-performance inference engine for running Moondream locally — on NVIDIA GPUs (Linux x86_64 / aarch64 or Windows AMD64), or on Apple Silicon Macs with native Metal kernels. It features custom CUDA and Metal kernels, automatic batching, paged KV caching, and prefix caching — the same engine that powers [Moondream Cloud](https://moondream.ai), now available for local and on-prem deployment.
+Photon is Moondream's high-performance local inference engine for NVIDIA GPUs
+(Linux x86_64 / aarch64 or Windows AMD64) and Apple Silicon Macs. It supports
+Moondream, Qwen, and Gemma models with custom CUDA and Metal kernels, automatic
+batching, paged KV caching, and prefix caching.
 
 ## Requirements
 
@@ -15,12 +18,14 @@ Photon is Moondream's high-performance inference engine for running Moondream lo
   - **NVIDIA GPU** (Ampere or newer) on Linux x86_64 / aarch64 or Windows AMD64 — see [Supported Hardware](#supported-hardware) for the full list.
   - **Apple Silicon Mac** (M-series) on macOS 13 (Ventura) or later.
 - **Python**: 3.10–3.14.
-- **API Key**: Get one from [moondream.ai](https://moondream.ai/c/cloud/api-keys).
+- **API key**: Optional for base models. A key from
+  [moondream.ai](https://moondream.ai/c/cloud/api-keys) is required for
+  finetuned models.
 
 ## Installation
 
 ```bash
-pip install moondream
+pip install --upgrade moondream
 ```
 
 This installs the Moondream Python client with built-in Photon support.
@@ -31,8 +36,8 @@ This installs the Moondream Python client with built-in Photon support.
 import moondream as md
 from PIL import Image
 
-# Initialize with local inference (NVIDIA GPU or Apple Silicon)
-model = md.vl(api_key="YOUR_API_KEY", local=True)
+# Initialize Photon local inference (NVIDIA GPU or Apple Silicon)
+model = md.photon()
 
 # Load an image
 image = Image.open("path/to/image.jpg")
@@ -45,6 +50,12 @@ print("Caption:", caption)
 answer = model.query(image, "What's in this image?")["answer"]
 print("Answer:", answer)
 
+# Continue a conversation
+chat = model.chat([
+    {"role": "user", "content": "Write a short poem about the moon."},
+])
+print("Chat:", chat["message"]["content"])
+
 # Detect objects
 objects = model.detect(image, "person")["objects"]
 for obj in objects:
@@ -54,9 +65,14 @@ for obj in objects:
 points = model.point(image, "person")["points"]
 for point in points:
     print(f"Center: ({point['x']}, {point['y']})")
+
+# Segment an object
+segment = model.segment(image, "person")
+print("SVG path:", segment["path"])
 ```
 
-The API is identical to [Moondream Cloud](/quickstart) — switch between local and cloud by toggling `local=True`.
+`md.vl(local=True, ...)` remains supported for existing applications and
+delegates to `md.photon(...)`.
 
 ## Configuration
 
@@ -64,18 +80,43 @@ The API is identical to [Moondream Cloud](/quickstart) — switch between local 
 
 ```python
 # Moondream 3 Preview (default)
-model = md.vl(api_key="YOUR_API_KEY", local=True)
+moondream3 = md.photon()
 
 # Moondream 2
-model = md.vl(api_key="YOUR_API_KEY", local=True, model="moondream2")
+moondream2 = md.photon("moondream2")
+
+# Moondream 3.1 9B A2B
+moondream31 = md.photon("moondream3.1-9B-A2B")
+
+# Qwen 3.5 4B
+qwen = md.photon("Qwen/Qwen3.5-4B")
+
+# Gemma 4 E2B
+gemma = md.photon("google/gemma-4-E2B-it")
 ```
 
-| Model | Repository | Notes |
-|-------|------------|-------|
-| Moondream 3 Preview | [moondream/moondream3-preview](https://huggingface.co/moondream/moondream3-preview) | Default |
-| Moondream 2 | [vikhyatk/moondream2](https://huggingface.co/vikhyatk/moondream2) | |
+| Family | Supported models |
+|--------|----------------|
+| Moondream | Moondream 2, Moondream 3 Preview, Moondream 3.1 9B A2B |
+| Qwen 3.5 | 0.8B, 2B, 4B, 9B, 27B, and 35B-A3B; base variants where published |
+| Qwen 3.6 | 27B and 35B-A3B; BF16 and FP8 checkpoints |
+| Gemma 4 | E2B, E4B, and 31B base and instruction variants |
+
+Use `md.photon_models()` to list the exact identifiers registered by the
+installed release. Models expose `model.tasks` and `model.supports(task)` so
+applications can discover their capabilities; not every model implements every
+Moondream-specific skill.
 
 Model weights are automatically downloaded from Hugging Face on first run and cached locally.
+
+Photon clients with identical configurations share an engine. Close clients
+when they are no longer needed, or use a context manager for deterministic GPU
+and worker cleanup:
+
+```python
+with md.photon("Qwen/Qwen3.5-4B") as model:
+    result = model.query(image, "What is in this image?")
+```
 
 ## Streaming
 
@@ -96,10 +137,9 @@ for chunk in model.query(image, "Describe this scene in detail.", stream=True)["
 If you've created a finetuned model through the [Moondream finetuning API](/finetuning), you can use it locally with Photon:
 
 ```python
-model = md.vl(
+model = md.photon(
+    "moondream3-preview/01HXYZ...@1000",
     api_key="YOUR_API_KEY",
-    local=True,
-    model="moondream3-preview/ft_abc123@1000"
 )
 ```
 
@@ -155,7 +195,8 @@ Jetson Thor (JetPack 7) and Jetson Orin (JetPack 6) install differently because 
 
 ### Jetson AGX Thor (JetPack 7)
 
-JetPack 7 ships CUDA 13 and is supported by the standard PyPI PyTorch aarch64 wheel — no custom NVIDIA wheel needed:
+JetPack 7 uses Python 3.12 and ships CUDA 13. It is supported by the standard
+PyPI PyTorch aarch64 wheel, so no custom NVIDIA wheel is needed:
 
 ```bash
 pip install moondream
@@ -165,7 +206,9 @@ This pulls in PyTorch along with the `nvidia-*-cu13` runtime packages and `nvpl`
 
 ```bash
 SITE=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
-export LD_LIBRARY_PATH="$SITE/nvidia/cu13/lib:$SITE/nvidia/cudnn/lib:$SITE/nvpl/lib:$LD_LIBRARY_PATH"
+LIBS=$(find "$SITE" -maxdepth 4 -type d -name lib 2>/dev/null \
+       | grep -E '/(nvidia|nvpl)/' | tr '\n' ':' | sed 's/:$//')
+export LD_LIBRARY_PATH="$LIBS:$LD_LIBRARY_PATH"
 ```
 
 Add the export to your shell profile (`~/.bashrc` or similar) so it persists across sessions.
@@ -219,10 +262,13 @@ Add the export to your shell profile (`~/.bashrc` or similar) so it persists acr
 ### Verify (Orin or Thor)
 
 ```bash
-python3 -c "import torch, moondream; print(torch.__version__, torch.cuda.get_device_name(0))"
+python3 -c "import torch, moondream; print('torch', torch.__version__, 'cuda', torch.cuda.is_available()); print('device', torch.cuda.get_device_name(0)); print('moondream OK')"
 ```
 
-You should see something like `2.9.1 NVIDIA Thor` (Thor) or `2.5.0a0+... Orin` (Orin). If you see a `libcudart.so.X` / `libnvToolsExt.so.1` / `libcupti.so` `cannot open shared object file` error, your `LD_LIBRARY_PATH` doesn't cover the right directory — re-check the previous step.
+You should see `cuda True`, the expected NVIDIA device name, and `moondream OK`.
+If you see a `libcudart.so.X` / `libnvToolsExt.so.1` / `libcupti.so`
+`cannot open shared object file` error, your `LD_LIBRARY_PATH` doesn't cover the
+right directory—re-check the previous step.
 
 ## Triton Inference Server
 
@@ -241,7 +287,6 @@ Then launch Triton with the model repository mounted:
 docker run --gpus all --rm -it \
   -p 8000:8000 -p 8001:8001 -p 8002:8002 \
   -v ./triton_server/model_repository:/models \
-  -e MOONDREAM_API_KEY=your-api-key \
   -e KESTREL_MODEL=moondream3-preview \
   nvcr.io/nvidia/tritonserver:24.08-py3 \
   bash -c "pip install kestrel && tritonserver --model-repository=/models"
@@ -253,19 +298,23 @@ To use a local model checkpoint instead of downloading:
 docker run --gpus all --rm -it \
   -p 8000:8000 -p 8001:8001 -p 8002:8002 \
   -v ./triton_server/model_repository:/models \
-  -v /path/to/model/weights:/model_weights \
-  -e MOONDREAM_API_KEY=your-api-key \
-  -e KESTREL_MODEL_PATH=/model_weights \
+  -v /path/to/model.safetensors:/model.safetensors \
+  -e KESTREL_MODEL=moondream3-preview \
+  -e KESTREL_MODEL_PATH=/model.safetensors \
   nvcr.io/nvidia/tritonserver:24.08-py3 \
   bash -c "pip install kestrel && tritonserver --model-repository=/models"
 ```
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MOONDREAM_API_KEY` | (required) | Moondream API key |
-| `KESTREL_MODEL` | `moondream3-preview` | `moondream2` or `moondream3-preview` |
+| `MOONDREAM_API_KEY` | — | Optional Photon API key |
+| `KESTREL_MODEL` | `moondream3-preview` | Any model identifier registered by the installed Kestrel release |
 | `KESTREL_MODEL_PATH` | — | Optional local path to model weights |
 | `KESTREL_MAX_BATCH_SIZE` | `4` | Maximum concurrent batch size |
+
+Set `KESTREL_MODEL` to the registered architecture that matches a local
+checkpoint. The bundled Triton backend exposes query, caption, detect, and
+point; the configured model must support the requested task.
 
 **Endpoints:**
 - HTTP: `http://localhost:8000`
@@ -278,20 +327,22 @@ Headline ChartQA req/s on Moondream 2 / Moondream 3 visual Q&A:
 
 | Hardware | Batch | Moondream 2 | Moondream 3 |
 |----------|------:|------------:|------------:|
-| B200 (Blackwell)        | 64 | 93 | 71 |
-| H100 (Hopper)           | 64 | 63 | 58 |
-| RTX PRO 6000 (Blackwell)| 64 | 39 | 40 |
+| B200 (Blackwell)        | 64 | 94 | 78 |
+| H100 (Hopper)           | 64 | 57 | 53 |
+| RTX PRO 6000 (Blackwell)| 64 | 42 | 39 |
 | MacBook Pro M5 Max      |  4 | 7.3 | 4.6 |
 
-For the full breakdown across every supported card and batch size — including P50/P90/P99 latency and Jetson Thor / Orin numbers — see [PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
+For direct and reasoning throughput and median latency across supported cards
+and batch sizes, see
+[PERFORMANCE.md](https://github.com/m87-labs/kestrel/blob/main/PERFORMANCE.md).
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `MOONDREAM_API_KEY` | Required. Get from [moondream.ai](https://moondream.ai/c/cloud/api-keys). Can also be passed as `api_key` parameter. |
+| `MOONDREAM_API_KEY` | Optional for base models and required for finetuned models. Can also be passed as `api_key`. |
 | `HF_HOME` | Override Hugging Face cache directory for model weights (default: `~/.cache/huggingface`). |
 
 ## Hugging Face Transformers
 
-If your hardware isn't on the [Supported Hardware](#supported-hardware) list — for example, an Intel Mac, an AMD GPU, or a non-Ampere NVIDIA GPU — Moondream can also be loaded via [Hugging Face Transformers](/transformers). On supported hardware (NVIDIA Ampere+ or Apple Silicon), Photon is strongly recommended — it delivers ~5× higher throughput and ~2.4× lower latency than the Transformers path on NVIDIA.
+If your hardware isn't on the [Supported Hardware](#supported-hardware) list — for example, an Intel Mac, an AMD GPU, or a non-Ampere NVIDIA GPU — Moondream can also be loaded via [Hugging Face Transformers](/transformers). On supported hardware (NVIDIA Ampere+ or Apple Silicon), Photon is the recommended local inference path.

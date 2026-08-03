@@ -6,12 +6,12 @@ The site is a Docusaurus 3 project. Keep docs-focused updates in `docs/`, groupe
 
 ## Build, Test, and Development Commands
 
-- `yarn install`: install Node dependencies; rerun when packages change.
-- `yarn start`: launch the dev server with hot reload on <http://localhost:3000/>.
-- `yarn build`: produce the production bundle in `build/`; run before merging structural or styling changes.
-- `yarn serve`: preview the latest `build/` output locally.
-- `yarn typecheck`: run the TypeScript compiler against MDX/TS sources to catch broken imports or props.
-- `yarn deploy`: publish the generated site to GitHub Pages; ensure `docusaurus.config.ts` URLs are correct first.
+- `npm ci`: install the exact dependencies in `package-lock.json`.
+- `npm start`: launch the dev server with hot reload on <http://localhost:3005/>.
+- `npm run build`: produce the production bundle in `build/`; run before merging structural or styling changes.
+- `npm run serve`: preview the latest `build/` output locally.
+- `npm run typecheck`: run the TypeScript compiler against MDX/TS sources to catch broken imports or props.
+- `npm run deploy`: publish the generated site to GitHub Pages; ensure `docusaurus.config.ts` URLs are correct first.
 
 ## Coding Style & Naming Conventions
 
@@ -19,8 +19,8 @@ Use TypeScript and React 19 idioms: functional components, hooks, and PascalCase
 
 ## Testing Guidelines
 
-Run `yarn typecheck` before every PR and ensure `yarn build` completes cleanly; both catch most configuration regressions. For new or reorganized docs, confirm sidebar ordering locally and click through new links in `yarn start`. If you embed live code blocks, preview them in both light and dark mode. When adding interactive React components, prefer colocated unit tests beneath the component (e.g., `Example.test.tsx`) and ensure they execute via `yarn typecheck` or in a dedicated script before merging.
+Run `npm run typecheck` before every PR and ensure `npm run build` completes cleanly; both catch most configuration regressions. For new or reorganized docs, confirm sidebar ordering locally and click through new links in `npm start`. If you embed live code blocks, preview them in both light and dark mode. When adding interactive React components, prefer colocated unit tests beneath the component (e.g., `Example.test.tsx`) and ensure they execute via `npm run typecheck` or in a dedicated script before merging.
 
 ## Commit & Pull Request Guidelines
 
-Follow the existing history: short, imperative summaries (e.g., “add quickstart note”). Reference related issues in the body when applicable and note any screenshot-worthy visual changes. Each PR description should list: purpose, key file touchpoints, validation steps (`yarn typecheck`, `yarn build`), and deployment impact. Request review from a docs maintainer when navigation or config files change, and include before/after screenshots for styling tweaks.
+Follow the existing history: short, imperative summaries (e.g., “add quickstart note”). Reference related issues in the body when applicable and note any screenshot-worthy visual changes. Each PR description should list: purpose, key file touchpoints, validation steps (`npm run typecheck`, `npm run build`), and deployment impact. Request review from a docs maintainer when navigation or config files change, and include before/after screenshots for styling tweaks.

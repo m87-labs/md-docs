@@ -85,15 +85,15 @@ Returns a dict:
 
 ```python
 {
-    "request": { ... },      # Pass back to train_step unchanged
+    "request": {"...": "..."},  # Pass back to train_step unchanged
     "rollouts": [
         {
             "skill": "query",
             "output": {"answer": "red"},
-            ...                # Opaque training metadata
+            "...": "...",          # Opaque training metadata
         }
     ],
-    "rewards": [0.8, ...]    # Present if ground_truth was provided, otherwise null
+    "rewards": [0.8],             # Present only with ground_truth
 }
 ```
 
@@ -240,7 +240,7 @@ ft.train_step([{
 Point targets can also use bounding boxes:
 
 ```python
-"target": {"boxes": [{"x_min": 0.45, "y_min": 0.22, "x_max": 0.58, "y_max": 0.39}]}
+target = {"boxes": [{"x_min": 0.45, "y_min": 0.22, "x_max": 0.58, "y_max": 0.39}]}
 ```
 
 **Detect:**

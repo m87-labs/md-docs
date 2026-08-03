@@ -22,7 +22,9 @@ Enable Moondream's reasoning capabilities to improve result quality for complex 
 - **High accuracy requirements**: When you need the most accurate possible answer
 
 ### Trade-offs
-- **Speed**: Reasoning adds minor latency to requests (typically 10-20% longer)
+- **Speed and output length**: Reasoning generates an explicit analysis before
+  the answer, so it can materially increase latency and generated tokens. Measure
+  it with prompts representative of your workload.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -48,6 +50,7 @@ image = Image.open("path/to/image.jpg")
 
 # Query with reasoning enabled
 result = model.query(image, "What is in this image?", reasoning=True)
+print(result["reasoning"])
 print(result["answer"])
 ```
 
@@ -72,6 +75,7 @@ const result = await model.query({
   question: 'What is in this image?',
   reasoning: true
 });
+console.log(result.reasoning);
 console.log(result.answer);
 ```
 
