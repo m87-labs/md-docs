@@ -54,7 +54,7 @@ By default, Moondream Station runs on port 2020. If that port is taken, Moondrea
 
 ![Video showing Moondream Station running in a terminal](https://raw.githubusercontent.com/m87-labs/moondream-station/55878b16dd3a675a9ccf9a292975aee97d055beb/assets/md_station_demo.gif)
 
-**Access via HTTP**: Point any of our inference clients at your Moondream Station; for example, with our python client you can do:
+**Access via HTTP**: Point any of our inference clients at your Moondream Station; for example, with the Python client:
 
 ```python
 import moondream as md

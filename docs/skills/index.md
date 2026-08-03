@@ -6,11 +6,13 @@ sidebar_position: 0
 
 # Skills
 
-Vision applications often need specific coordinates to things (e.g., bounding boxes, 2d points). Rather than require awkward prompting , Moondream has built-in support for with "Skills".
+Vision applications often need structured spatial results, such as bounding
+boxes or 2D points. Moondream exposes these common workflows as dedicated
+skills, so applications do not have to extract coordinates from free-form text.
 
 ## Available Skills
 
-### 💬 [Query](./query)
+### [Query](./query)
 
 The most general-purpose skill. Ask questions about images and get intelligent answers. Great for:
 
@@ -18,7 +20,7 @@ The most general-purpose skill. Ask questions about images and get intelligent a
 - Image analysis
 - Content verification
 
-### 📝 [Caption](./caption)
+### [Caption](./caption)
 
 Generate natural language descriptions of images. Perfect for:
 
@@ -27,7 +29,7 @@ Generate natural language descriptions of images. Perfect for:
 - Understanding image context
 - Retail item descriptions
 
-### 🎯 [Point](./point)
+### [Point](./point)
 
 Identify and locate specific elements within images by coordinates. Useful for:
 
@@ -35,7 +37,7 @@ Identify and locate specific elements within images by coordinates. Useful for:
 - Interactive image annotations
 - Precise element selection
 
-### 🔍 [Detect](./detect)
+### [Detect](./detect)
 
 Detect and identify objects, people, and elements in images. Ideal for:
 
@@ -43,7 +45,7 @@ Detect and identify objects, people, and elements in images. Ideal for:
 - Scene understanding
 - Content moderation
 
-### ✂️ [Segment](./segment)
+### [Segment](./segment)
 
 Generate precise SVG path segmentation masks for objects. Perfect for:
 
@@ -51,4 +53,3 @@ Generate precise SVG path segmentation masks for objects. Perfect for:
 - Precise object selection
 - Background removal
 - Interactive editing
-

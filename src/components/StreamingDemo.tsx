@@ -25,17 +25,17 @@ const StreamingDemo: React.FC<StreamingDemoProps> = ({
     }, [currentIndex, text, speed]);
 
     const chunks = [
-        'data: {"text": "The"}',
-        'data: {"text": " image"}',
-        'data: {"text": " shows"}',
-        'data: {"text": " a"}',
-        'data: {"text": " crescent"}',
-        'data: {"text": " moon"}',
-        'data: {"text": " against"}',
-        'data: {"text": " a"}',
-        'data: {"text": " black"}',
-        'data: {"text": " background"}',
-        'data: {"text": "."}',
+        'data: {"chunk": "The"}',
+        'data: {"chunk": " image"}',
+        'data: {"chunk": " shows"}',
+        'data: {"chunk": " a"}',
+        'data: {"chunk": " crescent"}',
+        'data: {"chunk": " moon"}',
+        'data: {"chunk": " against"}',
+        'data: {"chunk": " a"}',
+        'data: {"chunk": " black"}',
+        'data: {"chunk": " background"}',
+        'data: {"chunk": "."}',
     ];
 
     // Calculate which chunks to show based on how much text is displayed
@@ -61,4 +61,3 @@ const StreamingDemo: React.FC<StreamingDemoProps> = ({
 };
 
 export default StreamingDemo;
-

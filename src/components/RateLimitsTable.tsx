@@ -12,17 +12,17 @@ export default function RateLimitsTable() {
 
                 <div className={styles.tableBody}>
                     <div className={styles.row}>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Model">
                             <span className={styles.modelName}>moondream3.1-9B-A2B</span>
                         </div>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Base tier">
                             <div>
                                 <span className={styles.rateValue}>2</span>
                                 <span className={styles.rateUnit}>req/sec</span>
                             </div>
                             <div className={styles.tierNote}>Default for all API keys</div>
                         </div>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Funded account">
                             <div>
                                 <span className={styles.rateValue}>10</span>
                                 <span className={styles.rateUnit}>req/sec</span>
@@ -32,17 +32,17 @@ export default function RateLimitsTable() {
                     </div>
 
                     <div className={styles.row}>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Model">
                             <span className={styles.modelName}>moondream3-preview</span>
                         </div>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Base tier">
                             <div>
                                 <span className={styles.rateValue}>2</span>
                                 <span className={styles.rateUnit}>req/sec</span>
                             </div>
                             <div className={styles.tierNote}>Default for all API keys</div>
                         </div>
-                        <div className={styles.cell}>
+                        <div className={styles.cell} data-label="Funded account">
                             <div>
                                 <span className={styles.rateValue}>10</span>
                                 <span className={styles.rateUnit}>req/sec</span>

@@ -52,7 +52,7 @@ print("Answer:", answer)
 
 # Continue a conversation
 chat = model.chat([
-    {"role": "user", "content": "What is in this image?"},
+    {"role": "user", "content": "Write a short poem about the moon."},
 ])
 print("Chat:", chat["message"]["content"])
 
@@ -80,19 +80,19 @@ delegates to `md.photon(...)`.
 
 ```python
 # Moondream 3 Preview (default)
-model = md.photon()
+moondream3 = md.photon()
 
 # Moondream 2
-model = md.photon("moondream2")
+moondream2 = md.photon("moondream2")
 
 # Moondream 3.1 9B A2B
-model = md.photon("moondream3.1-9B-A2B")
+moondream31 = md.photon("moondream3.1-9B-A2B")
 
 # Qwen 3.5 4B
-model = md.photon("Qwen/Qwen3.5-4B")
+qwen = md.photon("Qwen/Qwen3.5-4B")
 
 # Gemma 4 E2B
-model = md.photon("google/gemma-4-E2B-it")
+gemma = md.photon("google/gemma-4-E2B-it")
 ```
 
 | Family | Supported models |
@@ -138,7 +138,7 @@ If you've created a finetuned model through the [Moondream finetuning API](/fine
 
 ```python
 model = md.photon(
-    "moondream3-preview/ft_abc123@1000",
+    "moondream3-preview/01HXYZ...@1000",
     api_key="YOUR_API_KEY",
 )
 ```
@@ -195,7 +195,8 @@ Jetson Thor (JetPack 7) and Jetson Orin (JetPack 6) install differently because 
 
 ### Jetson AGX Thor (JetPack 7)
 
-JetPack 7 ships CUDA 13 and is supported by the standard PyPI PyTorch aarch64 wheel — no custom NVIDIA wheel needed:
+JetPack 7 uses Python 3.12 and ships CUDA 13. It is supported by the standard
+PyPI PyTorch aarch64 wheel, so no custom NVIDIA wheel is needed:
 
 ```bash
 pip install moondream
@@ -205,7 +206,9 @@ This pulls in PyTorch along with the `nvidia-*-cu13` runtime packages and `nvpl`
 
 ```bash
 SITE=$(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
-export LD_LIBRARY_PATH="$SITE/nvidia/cu13/lib:$SITE/nvidia/cudnn/lib:$SITE/nvpl/lib:$LD_LIBRARY_PATH"
+LIBS=$(find "$SITE" -maxdepth 4 -type d -name lib 2>/dev/null \
+       | grep -E '/(nvidia|nvpl)/' | tr '\n' ':' | sed 's/:$//')
+export LD_LIBRARY_PATH="$LIBS:$LD_LIBRARY_PATH"
 ```
 
 Add the export to your shell profile (`~/.bashrc` or similar) so it persists across sessions.
@@ -259,10 +262,13 @@ Add the export to your shell profile (`~/.bashrc` or similar) so it persists acr
 ### Verify (Orin or Thor)
 
 ```bash
-python3 -c "import torch, moondream; print(torch.__version__, torch.cuda.get_device_name(0))"
+python3 -c "import torch, moondream; print('torch', torch.__version__, 'cuda', torch.cuda.is_available()); print('device', torch.cuda.get_device_name(0)); print('moondream OK')"
 ```
 
-You should see something like `2.9.1 NVIDIA Thor` (Thor) or `2.5.0a0+... Orin` (Orin). If you see a `libcudart.so.X` / `libnvToolsExt.so.1` / `libcupti.so` `cannot open shared object file` error, your `LD_LIBRARY_PATH` doesn't cover the right directory — re-check the previous step.
+You should see `cuda True`, the expected NVIDIA device name, and `moondream OK`.
+If you see a `libcudart.so.X` / `libnvToolsExt.so.1` / `libcupti.so`
+`cannot open shared object file` error, your `LD_LIBRARY_PATH` doesn't cover the
+right directory—re-check the previous step.
 
 ## Triton Inference Server
 
@@ -292,8 +298,9 @@ To use a local model checkpoint instead of downloading:
 docker run --gpus all --rm -it \
   -p 8000:8000 -p 8001:8001 -p 8002:8002 \
   -v ./triton_server/model_repository:/models \
-  -v /path/to/model/weights:/model_weights \
-  -e KESTREL_MODEL_PATH=/model_weights \
+  -v /path/to/model.safetensors:/model.safetensors \
+  -e KESTREL_MODEL=moondream3-preview \
+  -e KESTREL_MODEL_PATH=/model.safetensors \
   nvcr.io/nvidia/tritonserver:24.08-py3 \
   bash -c "pip install kestrel && tritonserver --model-repository=/models"
 ```
@@ -305,7 +312,9 @@ docker run --gpus all --rm -it \
 | `KESTREL_MODEL_PATH` | — | Optional local path to model weights |
 | `KESTREL_MAX_BATCH_SIZE` | `4` | Maximum concurrent batch size |
 
-Requests must select a task supported by the configured model.
+Set `KESTREL_MODEL` to the registered architecture that matches a local
+checkpoint. The bundled Triton backend exposes query, caption, detect, and
+point; the configured model must support the requested task.
 
 **Endpoints:**
 - HTTP: `http://localhost:8000`

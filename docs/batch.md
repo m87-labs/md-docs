@@ -58,12 +58,12 @@ import TabItem from '@theme/TabItem';
 INIT=$(curl -s -X POST "https://api.moondream.ai/v1/batch?action=mpu-create" \
   -H "X-Moondream-Auth: YOUR_API_KEY")
 
-FILE_ID=$(echo $INIT | jq -r '.fileId')
-UPLOAD_ID=$(echo $INIT | jq -r '.uploadId')
+FILE_ID=$(echo "$INIT" | jq -r '.fileId')
+UPLOAD_ID=$(echo "$INIT" | jq -r '.uploadId')
 
 # Step 2: Split file into 50MB chunks and upload each part
 CHUNK_SIZE=$((50 * 1024 * 1024))
-split -b $CHUNK_SIZE batch_input.jsonl chunk_
+split -b "$CHUNK_SIZE" batch_input.jsonl chunk_
 
 PARTS="[]"
 PART_NUM=1
@@ -71,10 +71,10 @@ for CHUNK in chunk_*; do
   PART=$(curl -s -X PUT "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-uploadpart&uploadId=$UPLOAD_ID&partNumber=$PART_NUM" \
     -H "X-Moondream-Auth: YOUR_API_KEY" \
     -H "Content-Type: application/octet-stream" \
-    --data-binary @$CHUNK)
-  ETAG=$(echo $PART | jq -r '.etag')
-  PARTS=$(echo $PARTS | jq ". + [{\"partNumber\": $PART_NUM, \"etag\": \"$ETAG\"}]")
-  rm $CHUNK
+    --data-binary "@$CHUNK")
+  ETAG=$(echo "$PART" | jq -r '.etag')
+  PARTS=$(echo "$PARTS" | jq ". + [{\"partNumber\": $PART_NUM, \"etag\": \"$ETAG\"}]")
+  rm -- "$CHUNK"
   PART_NUM=$((PART_NUM + 1))
 done
 
@@ -84,7 +84,7 @@ BATCH=$(curl -s -X POST "https://api.moondream.ai/v1/batch/$FILE_ID?action=mpu-c
   -H "Content-Type: application/json" \
   -d "{\"parts\": $PARTS, \"model\": \"moondream3.1-9B-A2B\"}")
 
-BATCH_ID=$(echo $BATCH | jq -r '.id')
+BATCH_ID=$(echo "$BATCH" | jq -r '.id')
 echo "Batch submitted: $BATCH_ID"
 ```
 

@@ -30,13 +30,11 @@ image = Image.open("path/to/image.jpg")
 # Ask a question
 result = model.query(image, "What's in this image?")
 answer = result["answer"]
-request_id = result["request_id"]
 print(f"Answer: {answer}")
-print(f"Request ID: {request_id}")
 
 # Stream the response
 stream_result = model.query(image, "What's in this image?", stream=True)
-for chunk in stream_result["chunk"]:
+for chunk in stream_result["answer"]:
     print(chunk, end="", flush=True)
 ```
 
@@ -59,7 +57,6 @@ const result = await model.query({
   question: "What's in this image?"
 });
 console.log(`Answer: ${result.answer}`);
-console.log(`Request ID: ${result.request_id}`);
 
 // Stream the response
 const stream = await model.query({
@@ -103,7 +100,7 @@ curl -X POST https://api.moondream.ai/v1/query \
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `model` | string | Yes | Model ID. Supported values include `moondream3.1-9B-A2B`, `moondream3-preview`, or a saved finetuned checkpoint in `{base_model}/{finetune_id}@{step}` format. |
-| `image_url` | string | Yes | Base64 data URL for the input image. |
+| `image_url` | string | No | Optional base64 data URL for visual questions; omit it for text-only queries. |
 | `question` | string | Yes | Question to answer about the image. |
 | `reasoning` | boolean | No | Enable reasoning trace for non-streaming requests. |
 | `stream` | boolean | No | Stream answer chunks as Server-Sent Events. |

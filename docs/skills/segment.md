@@ -2,7 +2,7 @@
 title: "Segment"
 description: "Generate precise SVG path segmentation masks for objects in images."
 sidebar_label: "Segment"
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Segment
@@ -201,10 +201,10 @@ The path coordinates are normalized to [0, 1] **relative to the bounding box**, 
     preserveAspectRatio="none"
     style="
       position: absolute;
-      left: calc(x_min * 100%);
-      top: calc(y_min * 100%);
-      width: calc((x_max - x_min) * 100%);
-      height: calc((y_max - y_min) * 100%);
+      left: 0.02%;
+      top: 0.39%;
+      width: 78.36%;
+      height: 99.32%;
     "
   >
     <path d="M 0 0.76 L 0 0.32..." fill="rgba(255,0,0,0.3)" stroke="red" stroke-width="0.01"/>
@@ -212,7 +212,7 @@ The path coordinates are normalized to [0, 1] **relative to the bounding box**, 
 </div>
 ```
 
-In practice, replace the `calc()` expressions with actual values from the bbox:
+Compute those percentages from the returned bounding box in application code:
 
 ```javascript
 const { bbox, path } = result;
@@ -251,8 +251,7 @@ def rasterize_mask(svg_path: str, bbox: dict, image_size: tuple[int, int]) -> Im
     h = bbox["y_max"] - bbox["y_min"]
 
     svg = f"""<svg viewBox=\"0 0 1 1\" width=\"{img_w}\" height=\"{img_h}\" preserveAspectRatio=\"none\">
-  <g style=\"position: absolute; left: {x_min * 100}%; top: {y_min * 100}%; width: {w * 100}%; height: {h * 100}%; transform-origin: 0 0; transform: scale({w} {h});\">    <path d=\"{svg_path}\" fill=\"white\" />
-  </g>
+  <path d=\"{svg_path}\" transform=\"translate({x_min} {y_min}) scale({w} {h})\" fill=\"white\" />
 </svg>"""
 
     png_bytes = cairosvg.svg2png(
@@ -274,7 +273,8 @@ overlay = Image.composite(red, image, mask)
 overlay.save("output.png")
 ```
 
-This keeps the path in bbox space (viewBox 0–1) and uses SVG sizing to place it on the image before rasterizing.
+This transforms the bounding-box-relative path into full-image normalized
+coordinates before rasterizing it at the image's pixel dimensions.
 
 ## Segment vs. Detect
 

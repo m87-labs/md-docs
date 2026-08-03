@@ -34,6 +34,7 @@ const queryResponse = await fetch("https://api.moondream.ai/v1/query", {
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
+    model: "moondream3.1-9B-A2B",
     image_url: image,  // Base64 encoded image
     question: objectPrompt,
     reasoning: true    // Enable grounded reasoning for better accuracy
@@ -64,9 +65,9 @@ for (const objectName of objects) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
+      model: "moondream3.1-9B-A2B",
       image_url: image,
-      object: objectName,
-      reasoning: true  // Enable grounded reasoning
+      object: objectName
     }),
   });
 

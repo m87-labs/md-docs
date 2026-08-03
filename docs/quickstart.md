@@ -3,7 +3,7 @@ sidebar_position: 2
 title: "Getting Started"
 ---
 
-Moondream is a powerful, fast, and efficient vision AI model. It can answer questions, detect objects, count and point, caption, perform OCR, and more.  Grab an API key at the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys) and try it out!
+Moondream is a powerful, fast, and efficient vision AI model. It can answer questions, detect objects, count and point, caption, perform OCR, and more. Grab an API key at the [Moondream Cloud Console](https://moondream.ai/c/cloud/api-keys) and try it out.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -347,5 +347,5 @@ Want to run Moondream on your own hardware instead of using the Cloud API? Check
 ## Next Steps
 
 - **Try it live**: Use our [interactive playground](https://moondream.ai/c/playground) to test without coding
-- **Deep dive**: Explore detailed documentation for each skill - [Query](/skills/query), [Detect](/skills/detect), [Point](/skills/point), [Caption](/skills/caption)
+- **Deep dive**: Explore detailed documentation for each skill: [Query](/skills/query), [Detect](/skills/detect), [Point](/skills/point), [Caption](/skills/caption), [Segment](/skills/segment)
 - **More capabilities**: Check out all [Moondream Skills](/skills/)

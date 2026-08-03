@@ -30,9 +30,7 @@ image = Image.open("path/to/image.jpg")
 # Generate a caption
 result = model.caption(image)
 caption = result["caption"]
-request_id = result["request_id"]
 print(f"Caption: {caption}")
-print(f"Request ID: {request_id}")
 
 # Generate a short caption
 short_result = model.caption(image, length="short")
@@ -41,7 +39,7 @@ print(f"Short Caption: {short_caption}")
 
 # Stream the response
 stream_result = model.caption(image, stream=True)
-for chunk in stream_result["chunk"]:
+for chunk in stream_result["caption"]:
     print(chunk, end="", flush=True)
 ```
 
@@ -61,7 +59,6 @@ const image = fs.readFileSync("path/to/image.jpg");
 // Generate a caption
 const result = await model.caption({ image: image });
 console.log(`Caption: ${result.caption}`);
-console.log(`Request ID: ${result.request_id}`);
 
 // Generate a short caption
 const shortResult = await model.caption({
@@ -134,17 +131,18 @@ For non-streaming responses:
 
 For streaming responses, you'll receive a series of data events:
 
-```json
-{data: {"chunk": "A scene ", "completed": false, "request_id": "2025-03-25_caption_123456"}}
-{data: {"chunk": "showing a mountain", "completed": false, "request_id": "2025-03-25_caption_123456"}}
-{data: {"chunk": " landscape.", "completed": false, "request_id": "2025-03-25_caption_123456"}}
-{data: {"completed": true, "chunk": "", "org_id": "a349504c-8006-54f3-8862-ba0c41d2b4d7", "request_id": "2025-03-25_caption_123456"}}
+```text
+data: {"chunk": "A scene ", "completed": false, "request_id": "2025-03-25_caption_123456"}
+data: {"chunk": "showing a mountain", "completed": false, "request_id": "2025-03-25_caption_123456"}
+data: {"chunk": " landscape.", "completed": false, "request_id": "2025-03-25_caption_123456"}
+data: {"completed": true, "chunk": "", "org_id": "a349504c-8006-54f3-8862-ba0c41d2b4d7", "request_id": "2025-03-25_caption_123456"}
 ```
 
 ## Caption Length Options
 
 - **"short"**: Brief 1-2 sentence summary (e.g., "A red car parked on a street.")
 - **"normal"** (default): Detailed description covering elements, context, colors, positioning, etc.
+- **"long"**: Extended, highly detailed description.
 
 ## Parameters
 

@@ -31,9 +31,7 @@ image = Image.open("path/to/image.jpg")
 # Locate objects (e.g., "person", "car", "face", etc.)
 result = model.point(image, "face")
 points = result["points"]
-request_id = result["request_id"]
 print(f"Found {len(points)} faces")
-print(f"Request ID: {request_id}")
 
 # Visualize the points
 plt.figure(figsize=(10, 10))
@@ -76,7 +74,6 @@ const result = await model.point({
   object: "face"
 });
 console.log(`Found ${result.points.length} faces`);
-console.log(`Request ID: ${result.request_id}`);
 
 // Process the points
 result.points.forEach((point, index) => {

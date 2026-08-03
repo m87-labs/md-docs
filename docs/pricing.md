@@ -44,4 +44,4 @@ Create an account and launch requests immediately (no sales conversations requir
 
 ## Enterprise plan
 
-Need a higher-volume contract, on-prem deployment, or tailored consulting support? Our enterprise plan covers bespoke requirements with dedicated technical guidance. Contact sales at [sales@moondream.ai](mailto:sales@moondream.ai) or [schedule a call](https://cal.com/moondream-sales) to scope a solution with our team.
+Need a higher-volume contract, on-prem deployment, or tailored consulting support? Our enterprise plan covers bespoke requirements with dedicated technical guidance. Contact sales at [sales@moondream.ai](mailto:sales@moondream.ai) or [schedule a call](https://cal.com/moondream) to scope a solution with our team.
