@@ -6,9 +6,11 @@ title: "Overview"
 
 # Overview
 
-Moondream is an open-source family of Vision Language Models (VLMs) built for powerful, efficient visual reasoning. Our newest release, Moondream 3 Preview, is a mixture-of-experts model with grounded visual reasoning, a 32k context window, and native support for multiple vision skills—like pointing, counting, and object detection—all designed with a deployment-friendly ethos.
+Moondream is an open-source family of Vision Language Models (VLMs) built for powerful, efficient visual reasoning. The Moondream 3 family uses a mixture-of-experts architecture with grounded visual reasoning, a 32k context window, and native support for multiple vision skills—like pointing, counting, and object detection—all designed with a deployment-friendly ethos.
 
-Moondream 3 Preview is now the default model for our cloud API and local processing with [Photon](/running-locally) – [get started here](./quickstart).
+Moondream 3 Preview remains the default for local inference with
+[Photon](/running-locally). For hosted inference, choose a model through the
+[Cloud API quickstart](./quickstart).
 
 ### Key stats
 
