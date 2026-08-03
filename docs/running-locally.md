@@ -50,7 +50,7 @@ print("Caption:", caption)
 answer = model.query(image, "What's in this image?")["answer"]
 print("Answer:", answer)
 
-# Continue a conversation
+# Start a chat
 chat = model.chat([
     {"role": "user", "content": "Write a short poem about the moon."},
 ])
