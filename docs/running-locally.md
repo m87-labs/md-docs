@@ -37,7 +37,7 @@ import moondream as md
 from PIL import Image
 
 # Initialize Photon local inference (NVIDIA GPU or Apple Silicon)
-model = md.photon()
+model = md.photon("moondream3.1-9B-A2B")
 
 # Load an image
 image = Image.open("path/to/image.jpg")
@@ -50,7 +50,7 @@ print("Caption:", caption)
 answer = model.query(image, "What's in this image?")["answer"]
 print("Answer:", answer)
 
-# Continue a conversation
+# Start a chat
 chat = model.chat([
     {"role": "user", "content": "Write a short poem about the moon."},
 ])
@@ -71,22 +71,22 @@ segment = model.segment(image, "person")
 print("SVG path:", segment["path"])
 ```
 
-`md.vl(local=True, ...)` remains supported for existing applications and
-delegates to `md.photon(...)`.
+`md.vl(local=True, model="moondream3.1-9B-A2B", ...)` remains supported for
+existing applications and delegates to `md.photon(...)`.
 
 ## Configuration
 
 ### Model Selection
 
 ```python
-# Moondream 3 Preview (default)
-moondream3 = md.photon()
+# Moondream 3.1 9B A2B
+moondream31 = md.photon("moondream3.1-9B-A2B")
 
 # Moondream 2
 moondream2 = md.photon("moondream2")
 
-# Moondream 3.1 9B A2B
-moondream31 = md.photon("moondream3.1-9B-A2B")
+# Moondream 3 Preview
+moondream3 = md.photon("moondream3-preview")
 
 # Qwen 3.5 4B
 qwen = md.photon("Qwen/Qwen3.5-4B")
