@@ -342,7 +342,9 @@ console.log(result.caption);
 
 ## Running Locally
 
-Want to run Moondream on your own hardware instead of using the Cloud API? Check out our [guide to running locally](/running-locally).
+Want to run models on your own hardware instead of using the Cloud API? Start
+with the [Photon local inference guide](/running-locally), or use
+[Whisper speech transcription](/transcription) on a supported NVIDIA GPU.
 
 ## Next Steps
 

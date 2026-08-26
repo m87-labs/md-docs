@@ -9,8 +9,9 @@ description: High-performance local inference with Photon on NVIDIA GPUs and App
 
 Photon is Moondream's high-performance local inference engine for NVIDIA GPUs
 (Linux x86_64 / aarch64 or Windows AMD64) and Apple Silicon Macs. It supports
-Moondream, Qwen, and Gemma models with custom CUDA and Metal kernels, automatic
-batching, paged KV caching, and prefix caching.
+Moondream, Qwen, and Gemma vision-language models, plus Whisper speech
+transcription on NVIDIA GPUs. Photon provides custom CUDA and Metal kernels,
+automatic batching, paged KV caching, and prefix caching.
 
 ## Requirements
 
@@ -93,6 +94,9 @@ qwen = md.photon("Qwen/Qwen3.5-4B")
 
 # Gemma 4 E2B
 gemma = md.photon("google/gemma-4-E2B-it")
+
+# Whisper large-v3-turbo (NVIDIA GPU)
+speech = md.photon("openai/whisper-large-v3-turbo")
 ```
 
 | Family | Supported models |
@@ -101,11 +105,16 @@ gemma = md.photon("google/gemma-4-E2B-it")
 | Qwen 3.5 | 0.8B, 2B, 4B, 9B, 27B, and 35B-A3B; base variants where published |
 | Qwen 3.6 | 27B and 35B-A3B; BF16 and FP8 checkpoints |
 | Gemma 4 | E2B, E4B, and 31B base and instruction variants |
+| Whisper | Whisper large-v3-turbo transcription and English translation |
 
 Use `md.photon_models()` to list the exact identifiers registered by the
 installed release. Models expose `model.tasks` and `model.supports(task)` so
 applications can discover their capabilities; not every model implements every
 Moondream-specific skill.
+
+Whisper currently runs through Photon's CUDA path on supported NVIDIA GPUs.
+See [Speech Transcription](/transcription) for files, progressive results, live
+PCM, translation, and timestamps.
 
 Model weights are automatically downloaded from Hugging Face on first run and cached locally.
 
@@ -131,6 +140,10 @@ for chunk in model.caption(image, stream=True)["caption"]:
 for chunk in model.query(image, "Describe this scene in detail.", stream=True)["answer"]:
     print(chunk, end="", flush=True)
 ```
+
+Speech models return replaceable transcript snapshots rather than token deltas.
+See [Progressive transcription](/transcription#progressive-transcription) and
+[Live PCM](/transcription#live-pcm).
 
 ## Using Finetunes
 

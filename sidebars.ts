@@ -11,6 +11,7 @@ const sidebars: SidebarsConfig = {
     'reasoning',
     'rate-limits',
     'running-locally',
+    'transcription',
     {
       type: 'category',
       label: 'Skills',
