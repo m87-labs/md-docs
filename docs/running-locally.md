@@ -9,9 +9,10 @@ description: High-performance local inference with Photon on NVIDIA GPUs and App
 
 Photon is Moondream's high-performance local inference engine for NVIDIA GPUs
 (Linux x86_64 / aarch64 or Windows AMD64) and Apple Silicon Macs. It supports
-Moondream, Qwen, and Gemma vision-language models, plus Whisper, Qwen3-ASR, and
-Parakeet speech transcription on NVIDIA GPUs. Photon provides custom CUDA and
-Metal kernels, automatic batching, paged KV caching, and prefix caching.
+Moondream, Qwen, and Gemma vision-language models, plus automatic speech
+recognition (ASR) with Whisper, Qwen3-ASR, and Parakeet on NVIDIA GPUs. Photon
+provides custom CUDA and Metal kernels, automatic batching, paged KV caching,
+and prefix caching.
 
 ## Requirements
 
@@ -120,10 +121,10 @@ installed release. Models expose `model.tasks` and `model.supports(task)` so
 applications can discover their capabilities; not every model implements every
 Moondream-specific skill.
 
-Speech models currently run through Photon's CUDA path on supported NVIDIA
-GPUs. See [Speech Transcription](/transcription) for model-specific language,
-prompt, translation, and timestamp support, plus files, progressive results,
-and live PCM.
+Speech-to-text models currently run through Photon's CUDA path on supported
+NVIDIA GPUs. See [Speech Transcription](/transcription) for model-specific
+language, prompt, translation, and timestamp support, plus files, progressive
+results, and live PCM.
 
 Model weights are automatically downloaded from Hugging Face on first run and cached locally.
 
