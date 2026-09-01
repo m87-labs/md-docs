@@ -344,7 +344,7 @@ console.log(result.caption);
 
 Want to run models on your own hardware instead of using the Cloud API? Start
 with the [Photon local inference guide](/running-locally), or use
-[Whisper speech transcription](/transcription) on a supported NVIDIA GPU.
+[Photon speech transcription](/transcription) on a supported NVIDIA GPU.
 
 ## Next Steps
 
