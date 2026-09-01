@@ -9,8 +9,9 @@ title: "Overview"
 Moondream is an open-weight family of Vision Language Models (VLMs) built for powerful, efficient visual reasoning. The Moondream 3 family uses a mixture-of-experts architecture with grounded visual reasoning, a 32k context window, and native support for multiple vision skills—like pointing, counting, and object detection—all designed with a deployment-friendly ethos.
 
 For local inference, [Photon](/running-locally) exposes Moondream, Qwen, Gemma,
-and Whisper models through the Moondream Python package. For hosted inference,
-choose a model through the [Cloud API quickstart](./quickstart).
+and speech models including Whisper, Qwen3-ASR, and Parakeet through the
+Moondream Python package. For hosted inference, choose a model through the
+[Cloud API quickstart](./quickstart).
 
 ### Key stats
 

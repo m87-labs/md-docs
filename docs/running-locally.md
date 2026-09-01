@@ -9,9 +9,9 @@ description: High-performance local inference with Photon on NVIDIA GPUs and App
 
 Photon is Moondream's high-performance local inference engine for NVIDIA GPUs
 (Linux x86_64 / aarch64 or Windows AMD64) and Apple Silicon Macs. It supports
-Moondream, Qwen, and Gemma vision-language models, plus Whisper speech
-transcription on NVIDIA GPUs. Photon provides custom CUDA and Metal kernels,
-automatic batching, paged KV caching, and prefix caching.
+Moondream, Qwen, and Gemma vision-language models, plus Whisper, Qwen3-ASR, and
+Parakeet speech transcription on NVIDIA GPUs. Photon provides custom CUDA and
+Metal kernels, automatic batching, paged KV caching, and prefix caching.
 
 ## Requirements
 
@@ -96,7 +96,13 @@ qwen = md.photon("Qwen/Qwen3.5-4B")
 gemma = md.photon("google/gemma-4-E2B-it")
 
 # Whisper large-v3-turbo (NVIDIA GPU)
-speech = md.photon("openai/whisper-large-v3-turbo")
+whisper = md.photon("openai/whisper-large-v3-turbo")
+
+# Qwen3-ASR 0.6B (NVIDIA GPU)
+qwen_asr = md.photon("Qwen/Qwen3-ASR-0.6B")
+
+# Parakeet TDT 0.6B v3 (NVIDIA GPU)
+parakeet = md.photon("nvidia/parakeet-tdt-0.6b-v3")
 ```
 
 | Family | Supported models |
@@ -104,17 +110,20 @@ speech = md.photon("openai/whisper-large-v3-turbo")
 | Moondream | Moondream 2, Moondream 3 Preview, Moondream 3.1 9B A2B |
 | Qwen 3.5 | 0.8B, 2B, 4B, 9B, 27B, and 35B-A3B; base variants where published |
 | Qwen 3.6 | 27B and 35B-A3B; BF16 and FP8 checkpoints |
-| Gemma 4 | E2B, E4B, and 31B base and instruction variants |
+| Gemma 4 | E2B, E4B, 26B-A4B, and 31B base and instruction variants |
 | Whisper | Whisper large-v3-turbo transcription and English translation |
+| Qwen3-ASR | 0.6B and 1.7B transcription with optional forced-alignment word timestamps |
+| Parakeet TDT | 0.6B v3 transcription with native word timestamps |
 
 Use `md.photon_models()` to list the exact identifiers registered by the
 installed release. Models expose `model.tasks` and `model.supports(task)` so
 applications can discover their capabilities; not every model implements every
 Moondream-specific skill.
 
-Whisper currently runs through Photon's CUDA path on supported NVIDIA GPUs.
-See [Speech Transcription](/transcription) for files, progressive results, live
-PCM, translation, and timestamps.
+Speech models currently run through Photon's CUDA path on supported NVIDIA
+GPUs. See [Speech Transcription](/transcription) for model-specific language,
+prompt, translation, and timestamp support, plus files, progressive results,
+and live PCM.
 
 Model weights are automatically downloaded from Hugging Face on first run and cached locally.
 
